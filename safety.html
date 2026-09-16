@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nightlife Safety — After Dark Society</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div id="chrome-header"></div>
+  <section>
+    <div class="container">
+      <p class="kicker">Safe Night</p>
+      <h2>Nightlife safety on After Dark Society</h2>
+      <p class="meta" style="max-width:62ch;margin:12px 0 28px">Discovery should not stop at the door. Every listed room can carry verification, security badges, last-entry time and a one-tap path to emergency services. Plans can be shared with a trusted contact when you book.</p>
+
+      <div class="grid grid-3" id="helplines"></div>
+
+      <h3 style="margin:36px 0 14px">How we score a venue</h3>
+      <div class="grid grid-3">
+        <article class="card" style="padding:18px"><h3>Verified listing</h3><p class="meta" style="margin-top:8px">Partner venues confirm licence, hours, cover and a floor manager contact before going live.</p></article>
+        <article class="card" style="padding:18px"><h3>On-floor security</h3><p class="meta" style="margin-top:8px">CCTV, bag check, metal detection, first-aid and female staff are shown as badges — not assumed.</p></article>
+        <article class="card" style="padding:18px"><h3>Exit & ride</h3><p class="meta" style="margin-top:8px">Last entry, well-lit exits and cab-stand notes help you plan the last mile before last call.</p></article>
+      </div>
+
+      <h3 style="margin:36px 0 14px">Before you go out</h3>
+      <div class="grid grid-2">
+        <article class="card" style="padding:18px">
+          <h3>Share your night plan</h3>
+          <p class="meta" style="margin-top:8px">Add an emergency number on the booking form. After confirm, you can send venue name, time and maps link to that contact.</p>
+          <button class="btn btn-primary" style="margin-top:12px" id="sharePlan">Share a sample plan</button>
+        </article>
+        <article class="card" style="padding:18px">
+          <h3>Report a concern</h3>
+          <p class="meta" style="margin-top:8px">Unsafe door policy, harassment or a fake listing can be flagged. After Dark Society reviews partner access; emergencies still go to 112 first.</p>
+          <form id="reportForm" style="margin-top:12px">
+            <div class="form-row"><label>Venue or event</label><input id="rpVenue" required></div>
+            <div class="form-row"><label>What happened (no graphic detail needed)</label><textarea id="rpNote" rows="3" required></textarea></div>
+            <button class="btn btn-ghost" type="submit">Submit report</button>
+          </form>
+        </article>
+      </div>
+
+      <h3 style="margin:36px 0 14px">Verified rooms with female staff on floor</h3>
+      <div class="grid grid-3" id="safeClubs"></div>
+    </div>
+  </section>
+  <div class="sos-bar">
+    <div class="container inner">
+      <strong>SOS</strong>
+      <a href="tel:112">112 Emergency</a>
+      <a href="tel:1091">1091 Women</a>
+      <a href="tel:108">108 Ambulance</a>
+      <a href="https://wa.me/917827170170" target="_blank">NCW WhatsApp</a>
+    </div>
+  </div>
+  <div id="chrome-footer"></div>
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.getElementById("chrome-header").innerHTML = npHeader("safety");
+    document.getElementById("chrome-footer").innerHTML = npFooter();
+    bindChrome();
+    document.getElementById("helplines").innerHTML = NP_DATA.safetyHelplines.map(h =>
+      `<article class="card" style="padding:18px">
+        <div class="tag" style="color:var(--ok)">${h.note}</div>
+        <h3 style="margin:8px 0">${h.name}</h3>
+        <a class="btn btn-primary" href="tel:${h.number}">Call ${h.number}</a>
+      </article>`
+    ).join("");
+    document.getElementById("safeClubs").innerHTML = NP_DATA.clubs
+      .filter(c => c.safety.verified && c.safety.femaleStaff)
+      .map(clubCard).join("");
+    document.getElementById("sharePlan").onclick = () => {
+      const text = "Night plan via After Dark Society: heading to a listed venue. If I don't check in, call me. Emergency in India: 112.";
+      if (navigator.share) navigator.share({ title: "After Dark Society plan", text });
+      else {
+        navigator.clipboard.writeText(text);
+        showToast("Plan copied. Paste it to a trusted contact.");
+      }
+    };
+    document.getElementById("reportForm").addEventListener("submit", e => {
+      e.preventDefault();
+      showToast("Report received. If you are in danger, call 112 now.");
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Night details — After Dark Society</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div id="chrome-header"></div>
+  <section>
+    <div class="container" style="max-width:640px">
+      <p class="kicker">Marked night</p>
+      <h2 id="dateTitle">Customer details</h2>
+      <p class="meta" id="dateSub" style="margin:8px 0 20px"></p>
+      <form class="card" style="padding:22px" id="dateForm">
+        <div class="form-row"><label>Name</label><input required id="dName"></div>
+        <div class="form-row"><label>WhatsApp</label><input required id="dPhone" type="tel" placeholder="+91"></div>
+        <div class="form-row"><label>No. of persons</label><input required id="dPeople" type="number" min="1" value="2"></div>
+        <div class="form-row"><label>Special service</label>
+          <select id="dService">
+            <option value="0" data-price="0">None</option>
+            <option value="table" data-price="3000">Dedicated Table</option>
+            <option value="screen" data-price="1500">Name on the screen</option>
+            <option value="dance" data-price="8000">2 female dance partners</option>
+            <option value="beer" data-price="2500">One bucket beer</option>
+            <option value="fire" data-price="2000">Fire gun shot</option>
+            <option value="escort" data-price="5000">Bouncer / escort</option>
+            <option value="pack" data-price="25000">Package ₹25,000</option>
+          </select>
+        </div>
+        <div class="form-row"><label>Advance (₹)</label><input id="dAmt" readonly></div>
+        <div class="form-row"><label>Special request</label><textarea id="dNote" rows="3"></textarea></div>
+        <button class="btn btn-primary" type="submit" style="width:100%">Continue to pay</button>
+      </form>
+    </div>
+  </section>
+  <div id="chrome-footer"></div>
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.getElementById("chrome-header").innerHTML = npHeader("home");
+    document.getElementById("chrome-footer").innerHTML = npFooter();
+    bindChrome();
+    const date = new URLSearchParams(location.search).get("date") || new Date().toISOString().slice(0,10);
+    document.getElementById("dateTitle").textContent = "Night of " + date;
+    document.getElementById("dateSub").textContent = "Yeh date calendar par marked hai. Details bharo.";
+    function sync() {
+      const p = Math.max(1, Number(document.getElementById("dPeople").value || 1));
+      const sel = document.getElementById("dService");
+      const extra = Number(sel.options[sel.selectedIndex].dataset.price || 0);
+      document.getElementById("dAmt").value = sel.value === "pack" ? 25000 : 1500 * p + extra;
+    }
+    document.getElementById("dPeople").oninput = sync;
+    document.getElementById("dService").onchange = sync;
+    sync();
+    document.getElementById("dateForm").onsubmit = e => {
+      e.preventDefault();
+      document.getElementById("bkName").value = document.getElementById("dName").value;
+      document.getElementById("bkPhone").value = document.getElementById("dPhone").value;
+      document.getElementById("bkPeople").value = document.getElementById("dPeople").value;
+      document.getElementById("bkDate").value = date;
+      document.getElementById("bkAmount").value = document.getElementById("dAmt").value;
+      document.getElementById("bkNote").value = document.getElementById("dNote").value;
+      document.getElementById("bookTarget").value = "Marked night " + date;
+      document.getElementById("bookModal").classList.add("open");
+    };
+  </script>
+</body>
+</html>

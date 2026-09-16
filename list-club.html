@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>List Your Club — After Dark Society</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div id="chrome-header"></div>
+  <section>
+    <div class="container" style="max-width:640px">
+      <p class="kicker">Partners</p>
+      <h2>List Your Club</h2>
+      <p class="meta" style="margin:10px 0 20px">Get discovered by nightlife traffic in your city. Approved venues unlock the owner dashboard.</p>
+      <form class="card" style="padding:20px" id="listForm">
+        <div class="form-row"><label>Club name</label><input id="lcName" required></div>
+        <div class="form-row"><label>City</label><select id="lcCity"></select></div>
+        <div class="form-row"><label>Area</label><input id="lcArea" placeholder="Gomti Nagar"></div>
+        <div class="form-row"><label>Owner name</label><input id="lcOwner" required></div>
+        <div class="form-row"><label>Phone</label><input id="lcPhone" required type="tel"></div>
+        <div class="form-row"><label>WhatsApp</label><input id="lcWa" type="tel"></div>
+        <div class="form-row"><label>Instagram</label><input id="lcIg" placeholder="@yourclub"></div>
+        <button class="btn btn-primary" type="submit" style="width:100%">Submit listing</button>
+      </form>
+      <p style="margin-top:16px"><a class="btn btn-ghost" href="dashboard.html">Preview owner dashboard</a></p>
+    </div>
+  </section>
+  <div id="chrome-footer"></div>
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.getElementById("chrome-header").innerHTML = npHeader("");
+    document.getElementById("chrome-footer").innerHTML = npFooter();
+    bindChrome();
+    document.getElementById("lcCity").innerHTML = NP_DATA.cities.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+    document.getElementById("listForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const city = document.getElementById("lcCity").value;
+      npSaveUserClub({
+        id: "req-club-" + Date.now(),
+        name: document.getElementById("lcName").value,
+        city,
+        area: document.getElementById("lcArea").value || "City",
+        address: (document.getElementById("lcArea").value || "") + ", " + npCityName(city),
+        rating: 0,
+        reviewsCount: 0,
+        genres: ["Commercial"],
+        open: "21:00",
+        close: "03:00",
+        entry: 999,
+        age: 21,
+        dress: "Smart casual",
+        phone: document.getElementById("lcPhone").value,
+        instagram: "https://instagram.com/" + (document.getElementById("lcIg").value || "").replace("@",""),
+        maps: "https://maps.google.com",
+        image: "https://images.unsplash.com/photo-1572116469696-31de0f17cc88?w=1200&q=80",
+        photos: [],
+        hours: { mon:"TBA",tue:"TBA",wed:"TBA",thu:"TBA",fri:"TBA",sat:"TBA",sun:"TBA" },
+        closedDays: [],
+        approved: false,
+        owner: document.getElementById("lcOwner").value
+      });
+      showToast("Club request sent. Admin approve karega tab Clubs par dikhega.");
+      setTimeout(() => location.href = "admin.html", 900);
+    });
+  </script>
+</body>
+</html>

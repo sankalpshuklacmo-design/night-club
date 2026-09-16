@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Offers — After Dark Society</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div id="chrome-header"></div>
+  <section>
+    <div class="container">
+      <p class="kicker">Deals</p>
+      <h2>Nightlife Offers</h2>
+      <div class="grid grid-3" id="list"></div>
+    </div>
+  </section>
+  <div id="chrome-footer"></div>
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.getElementById("chrome-header").innerHTML = npHeader("offers");
+    document.getElementById("chrome-footer").innerHTML = npFooter();
+    bindChrome();
+    const city = NP.getCity();
+    const offers = npAllOffers().filter(o => city==="all" || (npClub(o.clubId) && npClub(o.clubId).city === city));
+    document.getElementById("list").innerHTML = offers.map(o => {
+      const club = npClub(o.clubId);
+      return `<article class="card offer-card">
+        <div class="tag">${o.tag}</div>
+        <h3 style="margin:8px 0">${o.title}</h3>
+        <p class="meta">${club.name} · ${npCityName(club.city)}</p>
+        <p>${o.details}</p>
+        <p class="meta">${o.valid}</p>
+        <div class="card-actions" style="margin-top:12px">
+          <a class="btn btn-primary" href="club.html?id=${club.id}">View Offer</a>
+          <button class="btn btn-ghost" data-book="${club.name}">Book Table</button>
+        </div>
+      </article>`;
+    }).join("");
+  </script>
+</body>
+</html>

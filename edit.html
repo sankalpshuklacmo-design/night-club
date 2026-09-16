@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edit listings — After Dark Society</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div id="chrome-header"></div>
+  <section>
+    <div class="container">
+      <p class="kicker">CMS lite</p>
+      <h2>Venue, date, time edit</h2>
+      <p class="meta" style="margin:8px 0 20px">Club ya event choose karo, fields badlo, Save. Site turant update hoti hai is browser mein.</p>
+      <div class="grid grid-2">
+        <div class="card" style="padding:18px">
+          <h3>Clubs / venues</h3>
+          <div class="form-row" style="margin-top:12px"><label>Select club</label><select id="clubPick"></select></div>
+          <div class="form-row"><label>Name</label><input id="cName"></div>
+          <div class="form-row"><label>Area / venue</label><input id="cArea"></div>
+          <div class="form-row"><label>Address</label><input id="cAddr"></div>
+          <div class="form-row"><label>City id</label><select id="cCity"></select></div>
+          <div class="grid grid-2">
+            <div class="form-row"><label>Open</label><input id="cOpen" type="time"></div>
+            <div class="form-row"><label>Close</label><input id="cClose" type="time"></div>
+          </div>
+          <div class="form-row"><label>Entry ₹</label><input id="cEntry" type="number"></div>
+          <div class="form-row"><label>Phone</label><input id="cPhone"></div>
+          <button class="btn btn-primary" id="saveClub" type="button">Save club</button>
+        </div>
+        <div class="card" style="padding:18px">
+          <h3>Events</h3>
+          <div class="form-row" style="margin-top:12px"><label>Select event</label><select id="evPick"></select></div>
+          <div class="form-row"><label>Event name</label><input id="eName"></div>
+          <div class="form-row"><label>Venue (club)</label><select id="eClub"></select></div>
+          <div class="form-row"><label>Date</label><input id="eDate" type="date"></div>
+          <div class="grid grid-2">
+            <div class="form-row"><label>Start</label><input id="eStart" type="time"></div>
+            <div class="form-row"><label>End</label><input id="eEnd" type="time"></div>
+          </div>
+          <div class="form-row"><label>DJ</label><input id="eDj"></div>
+          <div class="form-row"><label>Price ₹</label><input id="ePrice" type="number"></div>
+          <button class="btn btn-primary" id="saveEv" type="button">Save event</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div id="chrome-footer"></div>
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.getElementById("chrome-header").innerHTML = npHeader("about");
+    document.getElementById("chrome-footer").innerHTML = npFooter();
+    bindChrome();
+    const clubPick = document.getElementById("clubPick");
+    const evPick = document.getElementById("evPick");
+    const eClub = document.getElementById("eClub");
+    const cCity = document.getElementById("cCity");
+    cCity.innerHTML = NP_DATA.cities.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+    function fill() {
+      clubPick.innerHTML = npAllClubs().map(c => `<option value="${c.id}">${c.name} — ${npCityName(c.city)}</option>`).join("");
+      evPick.innerHTML = npAllEvents().map(e => `<option value="${e.id}">${e.name}</option>`).join("");
+      eClub.innerHTML = npAllClubs().map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+      loadClub(); loadEv();
+    }
+    function loadClub() {
+      const c = npClub(clubPick.value); if (!c) return;
+      document.getElementById("cName").value = c.name;
+      document.getElementById("cArea").value = c.area || "";
+      document.getElementById("cAddr").value = c.address || "";
+      cCity.value = c.city;
+      document.getElementById("cOpen").value = c.open;
+      document.getElementById("cClose").value = c.close;
+      document.getElementById("cEntry").value = c.entry;
+      document.getElementById("cPhone").value = c.phone || "";
+    }
+    function loadEv() {
+      const ev = npAllEvents().find(e => e.id === evPick.value); if (!ev) return;
+      document.getElementById("eName").value = ev.name;
+      eClub.value = ev.clubId;
+      const d = npEventDate(ev.dateOffset || 0);
+      document.getElementById("eDate").value = d.toISOString().slice(0,10);
+      document.getElementById("eStart").value = ev.start;
+      document.getElementById("eEnd").value = ev.end;
+      document.getElementById("eDj").value = ev.dj || "";
+      document.getElementById("ePrice").value = ev.price || 0;
+    }
+    clubPick.onchange = loadClub;
+    evPick.onchange = loadEv;
+    document.getElementById("saveClub").onclick = () => {
+      npSetOverride("np_club_edits", clubPick.value, {
+        name: document.getElementById("cName").value,
+        area: document.getElementById("cArea").value,
+        address: document.getElementById("cAddr").value,
+        city: cCity.value,
+        open: document.getElementById("cOpen").value,
+        close: document.getElementById("cClose").value,
+        entry: Number(document.getElementById("cEntry").value || 0),
+        phone: document.getElementById("cPhone").value
+      });
+      if (window.NPApi) NPApi.createClub({ id: clubPick.value, name: document.getElementById("cName").value });
+      showToast("Club saved");
+      fill();
+    };
+    document.getElementById("saveEv").onclick = () => {
+      const dateVal = document.getElementById("eDate").value;
+      const target = new Date(dateVal + "T12:00:00");
+      const today = new Date(); today.setHours(0,0,0,0);
+      const offset = Math.round((target - today) / 86400000);
+      npSetOverride("np_event_edits", evPick.value, {
+        name: document.getElementById("eName").value,
+        clubId: eClub.value,
+        dateOffset: offset,
+        start: document.getElementById("eStart").value,
+        end: document.getElementById("eEnd").value,
+        dj: document.getElementById("eDj").value,
+        price: Number(document.getElementById("ePrice").value || 0)
+      });
+      if (window.NPApi) NPApi.createEvent({ id: evPick.value, name: document.getElementById("eName").value });
+      showToast("Event saved");
+      fill();
+    };
+    fill();
+  </script>
+</body>
+</html>

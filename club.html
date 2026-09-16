@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Club — After Dark Society</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div id="chrome-header"></div>
+  <div id="page"></div>
+  <div id="chrome-footer"></div>
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.getElementById("chrome-header").innerHTML = npHeader("clubs");
+    document.getElementById("chrome-footer").innerHTML = npFooter();
+    bindChrome();
+    const club = npClub(NP.qs("id")) || NP_DATA.clubs[0];
+    document.title = club.name + " — After Dark Society";
+    const open = npIsOpenNow(club);
+    const days = [["mon","Mon"],["tue","Tue"],["wed","Wed"],["thu","Thu"],["fri","Fri"],["sat","Sat"],["sun","Sun"]];
+    const today = npDayKey();
+    const events = NP_DATA.events.filter(e => e.clubId === club.id);
+    const offers = NP_DATA.offers.filter(o => o.clubId === club.id);
+    const reviews = NP_DATA.reviews.filter(r => r.clubId === club.id);
+    document.getElementById("page").innerHTML = `
+      <div class="cover" style="background-image:url('${club.image}')"></div>
+      <section class="detail-wrap">
+        <div class="container">
+          <div class="card" style="padding:22px">
+            <p class="kicker">${npCityName(club.city)} · ${club.area}</p>
+            <h2>${club.name}</h2>
+            <div class="meta">
+              <span class="stars">★ ${club.rating}</span>
+              <span>${club.reviewsCount} reviews</span>
+              <span class="status ${open?"open":"closed"}">${open?"Open Now":"Closed"}</span>
+              <span>${club.open} – ${club.close}</span>
+              <span>Entry ₹${club.entry.toLocaleString("en-IN")}</span>
+              <span>${club.age}+</span>
+            </div>
+            <p style="margin:10px 0 16px;color:var(--muted)">${club.address}</p>
+            <div class="card-actions">
+              <button class="btn btn-primary" data-book="${club.name}">Book Table</button>
+              <a class="btn btn-pink" href="${waLink(club.phone, "Hi " + club.name + ", I want to book a table via After Dark Society.")}" target="_blank">WhatsApp</a>
+              <a class="btn btn-ghost" href="${club.maps}" target="_blank">Get Directions</a>
+              <a class="btn btn-ghost" href="${club.maps}" target="_blank">Google Maps</a>
+              <a class="btn btn-ghost" href="${club.instagram}" target="_blank">Instagram</a>
+              <a class="btn btn-ghost" href="tel:${club.phone}">Contact</a>
+            </div>
+          </div>
+
+          <div class="grid grid-2" style="margin-top:18px">
+            <div class="card" style="padding:20px">
+              <h3>Opening hours</h3>
+              <div class="hours-grid" style="margin-top:12px">
+                ${days.map(([k,l]) => `<div class="${k===today?"today":""}"><strong>${l}</strong><br>${club.hours[k]}</div>`).join("")}
+              </div>
+              <p class="meta" style="margin-top:12px">Dress code: ${club.dress}</p>
+              <p class="meta">Genres: ${club.genres.join(" · ")}</p>
+            </div>
+            <div class="card" style="padding:20px">
+              <h3>Location</h3>
+              <p class="meta" style="margin:8px 0">${club.address}</p>
+              <iframe title="map" style="width:100%;height:220px;border:0;border-radius:14px;filter:grayscale(.3) contrast(1.1)"
+                src="https://maps.google.com/maps?q=${encodeURIComponent(club.address)}&z=14&output=embed"></iframe>
+            </div>
+          </div>
+
+          <h3 style="margin:28px 0 12px">Safety at this venue</h3>
+          <div class="card" style="padding:20px">
+            <div class="meta">
+              <span class="safety-pill">Score ${club.safety.safetyScore}/5</span>
+              ${club.safety.verified ? `<span class="safety-pill">Verified</span>` : ""}
+              ${club.safety.cctv ? `<span class="safety-pill">CCTV</span>` : ""}
+              ${club.safety.securityStaff ? `<span class="safety-pill">Security staff</span>` : ""}
+              ${club.safety.femaleStaff ? `<span class="safety-pill">Female staff on floor</span>` : ""}
+              ${club.safety.metalDetector ? `<span class="safety-pill">Metal detector</span>` : ""}
+              ${club.safety.bagCheck ? `<span class="safety-pill">Bag check</span>` : ""}
+              ${club.safety.firstAid ? `<span class="safety-pill">First aid</span>` : ""}
+              ${club.safety.wellLitExit ? `<span class="safety-pill">Lit exit</span>` : ""}
+              ${club.safety.cabStand ? `<span class="safety-pill">Cab stand nearby</span>` : ""}
+            </div>
+            <p class="meta" style="margin-top:12px">Last entry around ${club.safety.lastEntry}. Age ${club.age}+. If something feels wrong, tell the floor manager or call 112.</p>
+            <div class="card-actions" style="margin-top:12px">
+              <a class="btn btn-primary" href="tel:112">Call 112</a>
+              <a class="btn btn-ghost" href="safety.html">Safety guide</a>
+              <a class="btn btn-pink" href="${club.maps}" target="_blank">Share location</a>
+            </div>
+          </div>
+
+          <h3 style="margin:28px 0 12px">Photos</h3>
+          <div class="photo-row">
+            ${club.photos.map(src => `<img src="${src}" alt="${club.name}">`).join("")}
+          </div>
+
+          <h3 style="margin:28px 0 12px">Upcoming parties</h3>
+          <div class="grid grid-3">${events.map(eventCard).join("") || "<p class='meta'>No listed parties right now.</p>"}</div>
+
+          <h3 style="margin:28px 0 12px">Offers</h3>
+          <div class="grid grid-3">${offers.map(o => `<article class="card offer-card"><div class="tag">${o.tag}</div><h3 style="margin:8px 0">${o.title}</h3><p>${o.details}</p><p class="meta">${o.valid}</p></article>`).join("") || "<p class='meta'>No live offers.</p>"}</div>
+
+          <h3 style="margin:28px 0 12px">Reviews</h3>
+          <div class="grid grid-2">${reviews.map(r => `<article class="card" style="padding:16px"><strong>${r.name}</strong> <span class="stars">★ ${r.rating}</span><p style="margin-top:8px;color:var(--muted)">${r.text}</p></article>`).join("") || "<p class='meta'>Be the first to review.</p>"}</div>
+        </div>
+      </section>`;
+  </script>
+</body>
+</html>

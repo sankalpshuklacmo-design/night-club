@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>List Your Event — After Dark Society</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div id="chrome-header"></div>
+  <section>
+    <div class="container" style="max-width:720px">
+      <p class="kicker">Promoters & venues</p>
+      <h2>List your event</h2>
+      <p class="meta" style="margin:10px 0 22px">Apna gig, DJ night ya club party 2 minute mein add karo. Submit ke baad woh Parties & Events par live ho jaata hai is browser mein.</p>
+      <form class="card" style="padding:22px" id="evForm">
+        <div class="form-row"><label>Event name</label><input id="evName" required placeholder="Neon Fridays / Your gig name"></div>
+        <div class="grid grid-2">
+          <div class="form-row"><label>City</label><select id="evCity" required></select></div>
+          <div class="form-row"><label>Listed club (optional)</label><select id="evClub"></select></div>
+        </div>
+        <div class="form-row"><label>Venue name (if club not listed)</label><input id="evVenue" placeholder="Your venue / farmhouse / lounge"></div>
+        <div class="form-row"><label>Area</label><input id="evArea" placeholder="Indiranagar, Gomti Nagar..."></div>
+        <div class="grid grid-2">
+          <div class="form-row"><label>Date</label><input id="evDate" type="date" required></div>
+          <div class="form-row"><label>Entry price (₹) — 0 if free</label><input id="evPrice" type="number" min="0" value="999"></div>
+        </div>
+        <div class="grid grid-2">
+          <div class="form-row"><label>Start time</label><input id="evStart" type="time" value="21:00" required></div>
+          <div class="form-row"><label>End time</label><input id="evEnd" type="time" value="03:00" required></div>
+        </div>
+        <div class="form-row"><label>DJ / artist</label><input id="evDj" placeholder="DJ name or live act"></div>
+        <div class="form-row"><label>Vibe</label>
+          <select id="evTag">
+            <option>DJ Night</option>
+            <option>EDM</option>
+            <option>Bollywood</option>
+            <option>Hip-Hop</option>
+            <option>Techno</option>
+            <option>Live Music</option>
+            <option>Ladies Night</option>
+            <option>Couple Entry</option>
+            <option>Free Entry</option>
+          </select>
+        </div>
+        <div class="form-row"><label>Poster image URL (optional)</label><input id="evImg" placeholder="https://..."></div>
+        <div class="form-row"><label>Your phone / WhatsApp</label><input id="evPhone" type="tel" required placeholder="+91"></div>
+        <div class="form-row"><label>About the night</label><textarea id="evNote" rows="3" placeholder="Lineup, dress code, last entry..."></textarea></div>
+        <button class="btn btn-primary" type="submit" style="width:100%">Publish event</button>
+      </form>
+    </div>
+  </section>
+  <div id="chrome-footer"></div>
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.getElementById("chrome-header").innerHTML = npHeader("events");
+    document.getElementById("chrome-footer").innerHTML = npFooter();
+    bindChrome();
+    const citySel = document.getElementById("evCity");
+    citySel.innerHTML = NP_DATA.cities.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+    const clubSel = document.getElementById("evClub");
+    function fillClubs() {
+      const city = citySel.value;
+      const clubs = npAllClubs().filter(c => c.city === city);
+      clubSel.innerHTML = `<option value="">Not listed — I'll type venue</option>` + clubs.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+    }
+    fillClubs();
+    citySel.addEventListener("change", fillClubs);
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+    document.getElementById("evDate").value = tomorrow.toISOString().slice(0,10);
+    document.getElementById("evForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const city = citySel.value;
+      let clubId = clubSel.value;
+      if (!clubId) {
+        const venue = document.getElementById("evVenue").value.trim() || "Private venue";
+        clubId = "user-club-" + Date.now();
+        npSaveUserClub({
+          id: clubId,
+          name: venue,
+          city,
+          area: document.getElementById("evArea").value.trim() || "City",
+          address: (document.getElementById("evArea").value || "") + ", " + npCityName(city),
+          rating: 4.0,
+          reviewsCount: 0,
+          genres: [document.getElementById("evTag").value],
+          open: document.getElementById("evStart").value,
+          close: document.getElementById("evEnd").value,
+          entry: Number(document.getElementById("evPrice").value || 0),
+          age: 21,
+          dress: "As per event",
+          phone: document.getElementById("evPhone").value,
+          instagram: "https://instagram.com",
+          maps: "https://maps.google.com/?q=" + encodeURIComponent(venue + " " + npCityName(city)),
+          image: document.getElementById("evImg").value || "https://images.unsplash.com/photo-1571266028243-d220c9c3b31f?w=1200&q=80",
+          photos: [],
+          hours: { mon:"TBA",tue:"TBA",wed:"TBA",thu:"TBA",fri:"TBA",sat:"TBA",sun:"TBA" },
+          closedDays: [],
+          safety: { verified: false, cctv: false, securityStaff: true, femaleStaff: false, wellLitExit: true, metalDetector: false, bagCheck: false, firstAid: false, lastEntry: document.getElementById("evStart").value, cabStand: true, safetyScore: 3.5 }
+        });
+      }
+      const dateVal = document.getElementById("evDate").value;
+      const target = new Date(dateVal + "T12:00:00");
+      const today = new Date(); today.setHours(0,0,0,0);
+      const offset = Math.round((target - today) / 86400000);
+      const tag = document.getElementById("evTag").value;
+      const tags = [tag];
+      if (offset <= 0) tags.unshift("Tonight");
+      else if (offset === 1) tags.unshift("Tomorrow");
+      else if (offset < 7) tags.unshift("This Weekend");
+      const evRow = {
+        id: "user-ev-" + Date.now(),
+        name: document.getElementById("evName").value.trim(),
+        clubId,
+        dateOffset: offset,
+        start: document.getElementById("evStart").value,
+        end: document.getElementById("evEnd").value,
+        dj: document.getElementById("evDj").value.trim() || "TBA",
+        price: Number(document.getElementById("evPrice").value || 0),
+        interested: 1,
+        tags,
+        image: document.getElementById("evImg").value || "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80",
+        phone: document.getElementById("evPhone").value,
+        note: document.getElementById("evNote").value,
+        approved: false
+      };
+      npSaveUserEvent(evRow);
+      if (window.NPApi) NPApi.createEvent(evRow);
+      showToast("Request sent. Admin approve karega tab Events par dikhega.");
+      setTimeout(() => location.href = "admin.html", 900);
+    });
+  </script>
+</body>
+</html>

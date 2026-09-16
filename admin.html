@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin — After Dark Society</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div id="chrome-header"></div>
+  <section>
+    <div class="container" style="max-width:860px">
+      <p class="kicker">Control room</p>
+      <h2>Admin</h2>
+      <div id="gate" class="card" style="padding:22px;margin-top:16px">
+        <h3 id="gateTitle">Admin login</h3>
+        <p class="meta" id="gateHelp" style="margin:8px 0 14px">Pehli baar PIN + recovery WhatsApp number set karo.</p>
+        <div id="loginBox">
+          <div class="form-row" id="phoneSetupRow"><label>Recovery WhatsApp (unique)</label><input id="setupPhone" type="tel" placeholder="+91 98xxxxxxxx"></div>
+          <div class="form-row"><label>PIN</label><input id="pin" type="password" inputmode="numeric" placeholder="••••"></div>
+          <div class="card-actions">
+            <button class="btn btn-primary" type="button" id="gateGo">Continue</button>
+            <button class="btn btn-ghost" type="button" id="resetPin">Forgot PIN — OTP reset</button>
+          </div>
+        </div>
+        <div id="otpBox" style="display:none">
+          <div class="form-row"><label>Registered WhatsApp</label><input id="otpPhone" type="tel" placeholder="+91"></div>
+          <div class="card-actions">
+            <button class="btn btn-primary" type="button" id="sendOtp">Send OTP</button>
+          </div>
+          <div class="form-row" style="margin-top:12px"><label>OTP</label><input id="otpCode" inputmode="numeric" placeholder="6 digit"></div>
+          <div class="card-actions">
+            <button class="btn btn-primary" type="button" id="verifyOtp">Verify & reset PIN</button>
+            <button class="btn btn-ghost" type="button" id="otpCancel">Back</button>
+          </div>
+        </div>
+      </div>
+      <div id="desk" style="display:none">
+        <div class="kpi" style="margin:16px 0">
+          <div><span class="meta">Pending requests</span><strong id="kReq">0</strong></div>
+          <div><span class="meta">Bookings</span><strong id="kBook">0</strong></div>
+          <div><span class="meta">Payments</span><strong id="kPay">0</strong></div>
+          <div><span class="meta">Razorpay</span><strong id="kRzp">Off</strong></div>
+        </div>
+        <div class="filters" id="tabs">
+          <button class="chip active" data-t="book">Bookings</button>
+          <button class="chip" data-t="req">Customer requests</button>
+          <button class="chip" data-t="pay">Payments</button>
+          <button class="chip" data-t="rzp">Razorpay connect</button>
+          <button class="chip" data-t="clubs">Club management</button>
+          <button class="chip" data-t="events">Event management</button>
+          <button class="chip" data-t="offers">Offer management</button>
+        </div>
+        <div id="p-book" class="card" style="padding:18px"></div>
+        <div id="p-req" class="card" style="padding:18px;display:none"></div>
+        <div id="p-pay" class="card" style="padding:18px;display:none"></div>
+        <div id="p-rzp" class="card" style="padding:18px;display:none">
+          <h3>Razorpay</h3>
+          <p class="meta" style="margin:8px 0 12px">Key ID yahan. Poori payment history: Razorpay dashboard → Payments.</p>
+          <div class="form-row"><label>Key ID</label><input id="rzpKey" placeholder="rzp_test_..."></div>
+          <div class="form-row"><label>Business WhatsApp</label><input id="waBiz" placeholder="+91 98xxxxxxxx"></div>
+          <div class="card-actions">
+            <button class="btn btn-primary" type="button" id="saveRzp">Save connect</button>
+            <button class="btn btn-ghost" type="button" id="testRzp">Test ₹100</button>
+            <a class="btn btn-ghost" href="https://dashboard.razorpay.com/app/payments" target="_blank">Razorpay payments</a>
+          </div>
+          <p class="meta" id="rzpMsg" style="margin-top:10px"></p>
+        </div>
+        <div id="p-clubs" class="card" style="padding:18px;display:none">
+          <h3>Club management</h3>
+          <div class="grid grid-2">
+            <div class="form-row"><label>Name</label><input id="addCName"></div>
+            <div class="form-row"><label>City</label><select id="addCCity"></select></div>
+          </div>
+          <div class="form-row"><label>Area</label><input id="addCArea"></div>
+          <div class="card-actions">
+            <button class="btn btn-primary" type="button" id="addClubBtn">Add club</button>
+          </div>
+          <div id="clubAdminList" style="margin-top:16px"></div>
+        </div>
+        <div id="p-events" class="card" style="padding:18px;display:none">
+          <h3>Event management</h3>
+          <div class="form-row"><label>Event name</label><input id="addEName"></div>
+          <div class="form-row"><label>Venue / club</label><select id="addEClub"></select></div>
+          <div class="grid grid-2">
+            <div class="form-row"><label>Date</label><input id="addEDate" type="date"></div>
+            <div class="form-row"><label>Start</label><input id="addEStart" type="time" value="21:00"></div>
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-primary" type="button" id="addEvBtn">Add event</button>
+          </div>
+          <div id="eventAdminList" style="margin-top:16px"></div>
+        </div>
+        <div id="p-offers" class="card" style="padding:18px;display:none">
+          <h3>Offer management</h3>
+          <p class="meta" style="margin:8px 0 12px">Tonight / homepage offers yahi se add, edit, remove.</p>
+          <input type="hidden" id="editOffId">
+          <div class="form-row"><label>Title</label><input id="addOTitle" placeholder="Ladies Night"></div>
+          <div class="form-row"><label>Club / venue</label><select id="addOClub"></select></div>
+          <div class="form-row"><label>Details</label><textarea id="addODetails" rows="2"></textarea></div>
+          <div class="grid grid-2">
+            <div class="form-row"><label>Valid / tonight note</label><input id="addOValid" placeholder="Tonight 20:00–23:00"></div>
+            <div class="form-row"><label>Tag</label><input id="addOTag" placeholder="Tonight"></div>
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-primary" type="button" id="saveOffBtn">Save offer</button>
+          </div>
+          <div id="offerAdminList" style="margin-top:16px"></div>
+        </div>
+        <p style="margin-top:16px" class="card-actions">
+          <button class="btn btn-ghost" type="button" id="logout">Log out</button>
+          <button class="btn btn-ghost" type="button" id="resetPin2">Reset admin PIN</button>
+        </p>
+      </div>
+    </div>
+  </section>
+  <div id="chrome-footer"></div>
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.getElementById("chrome-header").innerHTML = npHeader("admin");
+    document.getElementById("chrome-footer").innerHTML = npFooter();
+    bindChrome();
+    const PIN_KEY = "np_admin_pin";
+    const PHONE_KEY = "np_admin_phone";
+    const SESSION_MS = 30 * 60 * 1000;
+    const LOCK_MS = 15 * 60 * 1000;
+    const FAIL_MAX = 5;
+    function digits(n) { return String(n || "").replace(/\D/g, ""); }
+    async function hashPin(pin) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("span.v1." + pin));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+    function lockedUntil() { return Number(localStorage.getItem("np_lock_until") || 0); }
+    function isLocked() { return Date.now() < lockedUntil(); }
+    function failLogin() {
+      const n = Number(localStorage.getItem("np_fail_n") || 0) + 1;
+      localStorage.setItem("np_fail_n", String(n));
+      if (n >= FAIL_MAX) {
+        localStorage.setItem("np_lock_until", String(Date.now() + LOCK_MS));
+        showToast("5 galat try. 15 min lock.");
+      } else showToast("Galat PIN (" + n + "/" + FAIL_MAX + ")");
+    }
+    function clearFails() { localStorage.removeItem("np_fail_n"); localStorage.removeItem("np_lock_until"); }
+    function touchSession() { sessionStorage.setItem("np_admin_ok", "1"); sessionStorage.setItem("np_admin_at", String(Date.now())); }
+    function unlocked() {
+      if (sessionStorage.getItem("np_admin_ok") !== "1") return false;
+      const at = Number(sessionStorage.getItem("np_admin_at") || 0);
+      if (Date.now() - at > SESSION_MS) {
+        sessionStorage.removeItem("np_admin_ok");
+        return false;
+      }
+      return true;
+    }
+    function showDesk() {
+      document.getElementById("gate").style.display = "none";
+      document.getElementById("desk").style.display = "block";
+      touchSession();
+      refresh();
+    }
+    setInterval(() => {
+      if (document.getElementById("desk").style.display !== "none" && !unlocked()) {
+        sessionStorage.removeItem("np_admin_ok");
+        location.reload();
+      }
+    }, 60000);
+    if (!localStorage.getItem(PIN_KEY)) document.getElementById("gateTitle").textContent = "Set admin PIN + phone";
+    else document.getElementById("phoneSetupRow").style.display = "none";
+    if (unlocked()) showDesk();
+    document.getElementById("gateGo").onclick = async () => {
+      if (isLocked()) return showToast("Locked. Baad mein try karo.");
+      const pin = document.getElementById("pin").value.trim();
+      if (pin.length < 4) return showToast("PIN kam se kam 4 digit");
+      const saved = localStorage.getItem(PIN_KEY);
+      const hashed = await hashPin(pin);
+      if (!saved) {
+        let ph = localStorage.getItem(PHONE_KEY) || "";
+        if (!ph) {
+          ph = digits(document.getElementById("setupPhone").value);
+          if (ph.length < 10) return showToast("Recovery WhatsApp 10 digit likho");
+          localStorage.setItem(PHONE_KEY, ph);
+        }
+        localStorage.setItem(PIN_KEY, hashed);
+        clearFails();
+        showDesk();
+        return showToast("PIN hashed + phone save");
+      }
+      const match = saved === hashed || saved === pin;
+      if (!match) return failLogin();
+      if (saved === pin) localStorage.setItem(PIN_KEY, hashed);
+      clearFails();
+      showDesk();
+    };
+    function showOtp(on) {
+      document.getElementById("loginBox").style.display = on ? "none" : "block";
+      document.getElementById("otpBox").style.display = on ? "block" : "none";
+      document.getElementById("gateTitle").textContent = on ? "OTP se PIN reset" : "Admin login";
+    }
+    function resetAdminPin() {
+      if (!localStorage.getItem(PHONE_KEY)) return showToast("Pehle login karke recovery phone set karo");
+      showOtp(true);
+      document.getElementById("desk").style.display = "none";
+      document.getElementById("gate").style.display = "block";
+      document.getElementById("otpPhone").value = localStorage.getItem(PHONE_KEY);
+      setTimeout(() => document.getElementById("sendOtp").click(), 200);
+    }
+    document.getElementById("resetPin").onclick = resetAdminPin;
+    document.getElementById("resetPin2").onclick = resetAdminPin;
+    document.getElementById("otpCancel").onclick = () => showOtp(false);
+    document.getElementById("sendOtp").onclick = () => {
+      if (isLocked()) return showToast("Locked.");
+      const last = Number(sessionStorage.getItem("np_otp_sent") || 0);
+      if (Date.now() - last < 60000) return showToast("OTP 60 sec baad dubara.");
+      const saved = localStorage.getItem(PHONE_KEY) || "";
+      let entered = digits(document.getElementById("otpPhone").value) || saved;
+      document.getElementById("otpPhone").value = entered;
+      if (entered.length < 10) return showToast("Phone likho");
+      if (entered !== saved && entered.slice(-10) !== saved.slice(-10)) return showToast("Yeh registered number nahi hai");
+      const otp = String(Math.floor(100000 + Math.random() * 900000));
+      sessionStorage.setItem("np_otp", otp);
+      sessionStorage.setItem("np_otp_exp", String(Date.now() + 5 * 60 * 1000));
+      sessionStorage.setItem("np_otp_sent", String(Date.now()));
+      sessionStorage.setItem("np_otp_fail", "0");
+      const msg = "After Dark Society admin OTP: " + otp + " — 5 min valid. Is code ko site par daalo PIN reset ke liye.";
+      location.href = waLink(entered, msg);
+    };
+    document.getElementById("verifyOtp").onclick = () => {
+      const code = document.getElementById("otpCode").value.trim();
+      const otp = sessionStorage.getItem("np_otp");
+      const exp = Number(sessionStorage.getItem("np_otp_exp") || 0);
+      if (!otp || Date.now() > exp) return showToast("OTP expire / send nahi hua");
+      if (code !== otp) {
+        const n = Number(sessionStorage.getItem("np_otp_fail") || 0) + 1;
+        sessionStorage.setItem("np_otp_fail", String(n));
+        if (n >= FAIL_MAX) {
+          localStorage.setItem("np_lock_until", String(Date.now() + LOCK_MS));
+          return showToast("OTP tries khatam. 15 min lock.");
+        }
+        return showToast("Galat OTP");
+      }
+      sessionStorage.removeItem("np_otp");
+      localStorage.removeItem(PIN_KEY);
+      sessionStorage.removeItem("np_admin_ok");
+      showToast("OTP ok. Naya PIN set karo.");
+      showOtp(false);
+      document.getElementById("gateTitle").textContent = "Set new admin PIN";
+      document.getElementById("phoneSetupRow").style.display = "none";
+      document.getElementById("pin").value = "";
+      document.getElementById("pin").focus();
+    };
+    document.getElementById("logout").onclick = () => { sessionStorage.removeItem("np_admin_ok"); location.reload(); };
+    document.getElementById("tabs").addEventListener("click", e => {
+      const b = e.target.closest("[data-t]"); if (!b) return;
+      document.querySelectorAll("#tabs .chip").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      ["req","pay","book","rzp","clubs","events","offers"].forEach(t => {
+        document.getElementById("p-" + t).style.display = b.dataset.t === t ? "block" : "none";
+      });
+    });
+    function bookings() { try { return JSON.parse(localStorage.getItem("np_bookings") || "[]"); } catch (e) { return []; } }
+    function payments() { try { return JSON.parse(localStorage.getItem("np_payments") || "[]"); } catch (e) { return []; } }
+    setInterval(() => {
+      if (document.getElementById("desk").style.display !== "none") refresh();
+    }, 4000);
+    async function pullRemote() {
+      if (!window.NPApi) return;
+      const data = await NPApi.req("/api/bookings");
+      if (!data || !data.bookings) return;
+      const map = {};
+      bookings().concat(data.bookings).forEach(b => { if (b && b.id) map[b.id] = b; });
+      localStorage.setItem("np_bookings", JSON.stringify(Object.values(map)));
+    }
+    async function refresh() {
+      await pullRemote();
+      const pendE = npUserEvents().filter(e => e.approved === false);
+      const pendC = npUserClubs().filter(c => c.approved === false);
+      document.getElementById("kReq").textContent = pendE.length + pendC.length;
+      document.getElementById("kBook").textContent = bookings().length;
+      document.getElementById("kPay").textContent = payments().length;
+      const key = localStorage.getItem("np_razorpay_key") || "";
+      document.getElementById("kRzp").textContent = key ? "On" : "Off";
+      document.getElementById("rzpKey").value = key;
+      document.getElementById("rzpMsg").textContent = key ? "Connected " + key.slice(0, 14) + "…" : "Not connected";
+      let html = "<h3>Customer requests</h3>";
+      if (!pendE.length && !pendC.length) html += "<p class='meta' style='margin-top:10px'>Koi pending request nahi.</p>";
+      pendC.forEach(c => {
+        html += "<div style='border-bottom:1px solid var(--stroke);padding:12px 0'><strong>CLUB</strong> · " + c.name + " · " + npCityName(c.city) + " · " + maskPhone(c.phone) +
+          "<div class='card-actions' style='margin-top:8px'><button class='btn btn-primary' data-ok-club='" + c.id + "'>Approve</button> <button class='btn btn-ghost' data-no-club='" + c.id + "'>Reject</button></div></div>";
+      });
+      pendE.forEach(ev => {
+        html += "<div style='border-bottom:1px solid var(--stroke);padding:12px 0'><strong>EVENT</strong> · " + ev.name + " · " + ev.start + "–" + ev.end +
+          "<div class='card-actions' style='margin-top:8px'><button class='btn btn-primary' data-ok-ev='" + ev.id + "'>Approve</button> <button class='btn btn-ghost' data-no-ev='" + ev.id + "'>Reject</button></div></div>";
+      });
+      document.getElementById("p-req").innerHTML = html;
+      const pays = payments();
+      document.getElementById("p-pay").innerHTML = "<h3>Payments</h3>" + (pays.length ? pays.map(p => "<p style='border-bottom:1px solid var(--stroke);padding:8px 0'><strong>" + p.id + "</strong> · ₹" + p.amount + " · " + p.status + " · " + (p.paymentId || "") + "</p>").join("") : "<p class='meta' style='margin-top:10px'>Koi local payment nahi. Poori list Razorpay dashboard par.</p>");
+      const bks = bookings();
+      document.getElementById("p-book").innerHTML = "<h3>Bookings</h3>" + (bks.length ? bks.map(b => "<p style='border-bottom:1px solid var(--stroke);padding:8px 0'><strong>" + b.id + "</strong> · " + (b.name || "") + " · " + maskPhone(b.phone) + " · " + (b.venue || "") + " · " + b.status + " · ₹" + (b.amount || 0) + "</p>").join("") : "<p class='meta' style='margin-top:10px'>Koi booking nahi.</p>");
+      const evs = npAllEvents(true);
+      const elist = document.getElementById("eventAdminList");
+      if (elist) elist.innerHTML = evs.length
+        ? evs.map(ev => {
+            const club = npClub(ev.clubId);
+            return "<div style='border-bottom:1px solid var(--stroke);padding:10px 0;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap'><span><strong>" + ev.name + "</strong> · " + (club ? npCityName(club.city) : "") + " · " + ev.start + "–" + ev.end + "</span><button class='btn btn-ghost' data-del-ev='" + ev.id + "'>Remove</button></div>";
+          }).join("")
+        : "<p class='meta'>Koi event nahi.</p>";
+      const clist = document.getElementById("clubAdminList");
+      if (clist) {
+        const cls = npAllClubs(true);
+        clist.innerHTML = cls.map(c => "<div style='border-bottom:1px solid var(--stroke);padding:10px 0;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap'><span><strong>" + c.name + "</strong> · " + npCityName(c.city) + "</span><button class='btn btn-ghost' data-del-club='" + c.id + "'>Remove</button></div>").join("");
+      }
+      const ac = document.getElementById("addCCity");
+      const ae = document.getElementById("addEClub");
+      if (ac && !ac.dataset.ok) {
+        ac.innerHTML = NP_DATA.cities.map(c => "<option value='" + c.id + "'>" + c.name + "</option>").join("");
+        ac.dataset.ok = "1";
+      }
+      if (ae) ae.innerHTML = npAllClubs().map(c => "<option value='" + c.id + "'>" + c.name + " (" + npCityName(c.city) + ")</option>").join("");
+      const ao = document.getElementById("addOClub");
+      if (ao) ao.innerHTML = npAllClubs().map(c => "<option value='" + c.id + "'>" + c.name + " (" + npCityName(c.city) + ")</option>").join("");
+      const olist = document.getElementById("offerAdminList");
+      if (olist) {
+        olist.innerHTML = npAllOffers().map(o => {
+          const club = npClub(o.clubId);
+          return "<div style='border-bottom:1px solid var(--stroke);padding:10px 0;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap'><span><strong>" + o.title + "</strong> · " + (club ? club.name : "") + " · " + (o.tag || "") + "<br><span class='meta'>" + (o.valid || "") + "</span></span><span class='card-actions'><button class='btn btn-ghost' data-edit-off='" + o.id + "'>Edit</button><button class='btn btn-ghost' data-del-off='" + o.id + "'>Remove</button></span></div>";
+        }).join("") || "<p class='meta'>Koi offer nahi.</p>";
+      }
+    }
+    document.getElementById("eventAdminList").addEventListener("click", e => {
+      const id = e.target.getAttribute("data-del-ev");
+      if (!id) return;
+      if (!confirm("Remove this event?")) return;
+      npRemoveEvent(id);
+      showToast("Event removed");
+      refresh();
+    });
+    document.getElementById("clubAdminList").addEventListener("click", e => {
+      const id = e.target.getAttribute("data-del-club");
+      if (!id) return;
+      if (!confirm("Remove this club?")) return;
+      npRemoveClub(id);
+      showToast("Club removed");
+      refresh();
+    });
+    document.getElementById("addClubBtn").onclick = () => {
+      const name = document.getElementById("addCName").value.trim();
+      const city = document.getElementById("addCCity").value;
+      if (!name) return showToast("Club name likho");
+      npSaveUserClub({
+        id: "adm-club-" + Date.now(),
+        name, city,
+        area: document.getElementById("addCArea").value || "City",
+        address: npCityName(city),
+        rating: 4.2, reviewsCount: 0, genres: ["Commercial"],
+        open: "21:00", close: "03:00", entry: 999, age: 21, dress: "Smart casual",
+        phone: "", instagram: "https://instagram.com", maps: "https://maps.google.com",
+        image: npCityImage(city), photos: [],
+        hours: { mon:"21:00–03:00",tue:"21:00–03:00",wed:"21:00–03:00",thu:"21:00–03:00",fri:"21:00–04:00",sat:"21:00–04:00",sun:"20:00–02:00" },
+        closedDays: [], approved: true
+      });
+      document.getElementById("addCName").value = "";
+      showToast("Club added");
+      refresh();
+    };
+    document.getElementById("addEvBtn").onclick = () => {
+      const name = document.getElementById("addEName").value.trim();
+      const clubId = document.getElementById("addEClub").value;
+      if (!name || !clubId) return showToast("Name aur venue chahiye");
+      const dateVal = document.getElementById("addEDate").value || new Date().toISOString().slice(0,10);
+      const target = new Date(dateVal + "T12:00:00");
+      const today = new Date(); today.setHours(0,0,0,0);
+      const club = npClub(clubId);
+      npSaveUserEvent({
+        id: "adm-ev-" + Date.now(),
+        name, clubId,
+        dateOffset: Math.round((target - today) / 86400000),
+        start: document.getElementById("addEStart").value || "21:00",
+        end: "03:00", dj: "TBA", price: 999, interested: 1,
+        tags: ["This Weekend"],
+        image: npCityImage(club && club.city),
+        approved: true
+      });
+      document.getElementById("addEName").value = "";
+      showToast("Event added");
+      refresh();
+    };
+    document.getElementById("offerAdminList").addEventListener("click", e => {
+      const del = e.target.getAttribute("data-del-off");
+      const ed = e.target.getAttribute("data-edit-off");
+      if (del) {
+        if (!confirm("Remove this offer?")) return;
+        npRemoveOffer(del);
+        showToast("Offer removed");
+        refresh();
+      }
+      if (ed) {
+        const o = npAllOffers().find(x => x.id === ed);
+        if (!o) return;
+        document.getElementById("editOffId").value = o.id;
+        document.getElementById("addOTitle").value = o.title || "";
+        document.getElementById("addOClub").value = o.clubId || "";
+        document.getElementById("addODetails").value = o.details || "";
+        document.getElementById("addOValid").value = o.valid || "";
+        document.getElementById("addOTag").value = o.tag || "Tonight";
+        showToast("Edit form mein aaya. Save offer dabaao.");
+      }
+    });
+    document.getElementById("saveOffBtn").onclick = () => {
+      const title = document.getElementById("addOTitle").value.trim();
+      const clubId = document.getElementById("addOClub").value;
+      if (!title || !clubId) return showToast("Title aur club chahiye");
+      const row = {
+        title, clubId,
+        details: document.getElementById("addODetails").value.trim() || "Tonight special.",
+        valid: document.getElementById("addOValid").value.trim() || "Tonight",
+        tag: document.getElementById("addOTag").value.trim() || "Tonight"
+      };
+      const existing = document.getElementById("editOffId").value;
+      if (existing) {
+        if (NP_DATA.offers.some(o => o.id === existing)) npSetOverride("np_offer_edits", existing, row);
+        else npSaveUserOffer(Object.assign({ id: existing }, row));
+        document.getElementById("editOffId").value = "";
+        showToast("Offer updated");
+      } else {
+        npSaveUserOffer(Object.assign({ id: "off-" + Date.now() }, row));
+        showToast("Offer added");
+      }
+      document.getElementById("addOTitle").value = "";
+      document.getElementById("addODetails").value = "";
+      refresh();
+    };
+    document.getElementById("p-req").addEventListener("click", e => {
+      const okc = e.target.getAttribute("data-ok-club");
+      const noc = e.target.getAttribute("data-no-club");
+      const oke = e.target.getAttribute("data-ok-ev");
+      const noe = e.target.getAttribute("data-no-ev");
+      if (okc) npPatchUserClub(okc, { approved: true });
+      if (noc) npPatchUserClub(noc, { approved: "rejected" });
+      if (oke) npPatchUserEvent(oke, { approved: true });
+      if (noe) npPatchUserEvent(noe, { approved: "rejected" });
+      if (okc || noc || oke || noe) { showToast("Updated"); refresh(); }
+    });
+    const waEl = document.getElementById("waBiz");
+    if (waEl) waEl.value = localStorage.getItem("np_wa") || "";
+    document.getElementById("saveRzp").onclick = () => {
+      localStorage.setItem("np_razorpay_key", document.getElementById("rzpKey").value.trim());
+      if (waEl) localStorage.setItem("np_wa", waEl.value.trim());
+      showToast("Saved"); refresh();
+    };
+    document.getElementById("testRzp").onclick = () => {
+      const key = localStorage.getItem("np_razorpay_key") || "";
+      if (!key || !window.Razorpay) return showToast("Key save + refresh");
+      new Razorpay({
+        key, amount: 10000, currency: "INR", name: "After Dark Society", description: "Test",
+        handler: function (r) {
+          const pays = payments();
+          pays.unshift({ id: "TST", amount: 100, status: "paid", paymentId: r.razorpay_payment_id });
+          localStorage.setItem("np_payments", JSON.stringify(pays));
+          showToast(r.razorpay_payment_id); refresh();
+        },
+        theme: { color: "#7a2cff" }
+      }).open();
+    };
+  </script>
+</body>
+</html>

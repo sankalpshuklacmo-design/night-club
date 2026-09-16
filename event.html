@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Event — After Dark Society</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div id="chrome-header"></div>
+  <div id="page"></div>
+  <div id="chrome-footer"></div>
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.getElementById("chrome-header").innerHTML = npHeader("events");
+    document.getElementById("chrome-footer").innerHTML = npFooter();
+    bindChrome();
+    const ev = NP_DATA.events.find(e => e.id === NP.qs("id")) || NP_DATA.events[0];
+    const club = npClub(ev.clubId);
+    document.title = ev.name + " — After Dark Society";
+    document.getElementById("page").innerHTML = `
+      <div class="cover" style="background-image:url('${ev.image}')"></div>
+      <section class="detail-wrap">
+        <div class="container">
+          <div class="card" style="padding:22px">
+            <p class="kicker">${ev.tags.join(" · ")}</p>
+            <h2>${ev.name}</h2>
+            <div class="meta">
+              <span><a href="club.html?id=${club.id}">${club.name}</a></span>
+              <span>${npCityName(club.city)} · ${club.area}</span>
+              <span>${npFmtDate(npEventDate(ev.dateOffset))}</span>
+              <span>${ev.start} – ${ev.end}</span>
+              <span>${ev.dj}</span>
+              <span>${ev.price ? "₹" + ev.price.toLocaleString("en-IN") : "Free Entry"}</span>
+              <span>${ev.interested.toLocaleString("en-IN")} interested</span>
+            </div>
+            <p style="margin:14px 0;color:var(--muted)">A After Dark Society featured night at ${club.name}. Arrive early for smoother entry. Age ${club.age}+. ${club.dress}</p>
+            <div class="card-actions">
+              <button class="btn btn-primary" data-book="${ev.name}">Book Now</button>
+              <a class="btn btn-pink" href="${waLink(club.phone, "Hi, I want guest list / table for " + ev.name)}" target="_blank">WhatsApp club</a>
+              <a class="btn btn-ghost" href="club.html?id=${club.id}">View Club</a>
+              <a class="btn btn-ghost" href="${club.maps}" target="_blank">Get Directions</a>
+            </div>
+          </div>
+        </div>
+      </section>`;
+  </script>
+</body>
+</html>

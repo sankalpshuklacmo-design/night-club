@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Parties & Events — After Dark Society</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div id="chrome-header"></div>
+  <section>
+    <div class="container">
+      <p class="kicker">Tonight and beyond</p>
+      <div class="section-head">
+        <h2>Filter the lineup</h2>
+        <a class="btn btn-primary" href="list-event.html">List your event</a>
+      </div>
+      <div class="filters" id="tags"></div>
+      <div class="grid grid-3" id="list"></div>
+    </div>
+  </section>
+  <div id="chrome-footer"></div>
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.getElementById("chrome-header").innerHTML = npHeader("events");
+    document.getElementById("chrome-footer").innerHTML = npFooter();
+    bindChrome();
+    const tags = ["all","Tonight","Tomorrow","This Weekend","DJ Night","Bollywood","EDM","Hip-Hop","Techno","Live Music","Ladies Night","Couple Entry","Free Entry"];
+    const box = document.getElementById("tags");
+    box.innerHTML = tags.map((t,i)=>`<button class="chip ${i===0?"active":""}" data-tag="${t}">${t==="all"?"All":t}</button>`).join("");
+    function render(tag) {
+      document.getElementById("list").innerHTML = filterEvents({ city: NP.getCity(), tag: tag==="all"?null:tag }).map(eventCard).join("") || "<p class='meta'>No events for this filter.</p>";
+    }
+    render("all");
+    box.addEventListener("click", e => {
+      const b = e.target.closest(".chip"); if (!b) return;
+      box.querySelectorAll(".chip").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      render(b.dataset.tag);
+    });
+  </script>
+</body>
+</html>
