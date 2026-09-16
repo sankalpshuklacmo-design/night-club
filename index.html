@@ -6,14 +6,14 @@
   <title>After Dark Society</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="chrome-header"></div>
   <section class="hero">
     <div class="hero-media">
-      <video autoplay muted loop playsinline poster="media/hero-crowd.mp4">
-        <source src="media/hero-crowd.mp4" type="video/mp4" />
+      <video autoplay muted loop playsinline poster="crowd.jpg">
+        <source src="hero-crowd.mp4" type="video/mp4" />
       </video>
     </div>
     <div class="hero-content">
@@ -25,150 +25,65 @@
         <input id="heroQ" placeholder="Search clubs, DJs, parties..." />
         <button class="btn btn-primary" type="submit">Explore Tonight</button>
       </form>
-      <div class="stats">
-        <div><strong>500+</strong>Clubs</div>
-        <div><strong>1,000+</strong>Events</div>
-        <div><strong>50+</strong>Cities</div>
-      </div>
     </div>
   </section>
-
   <section>
     <div class="container">
       <div class="section-head">
-        <div>
-          <p class="kicker">Venues</p>
-          <h2>Explore Clubs</h2>
-        </div>
-        <a class="btn btn-ghost" href="pages/clubs.html">See all</a>
+        <div><p class="kicker">Venues</p><h2>Explore Clubs</h2></div>
+        <a class="btn btn-ghost" href="clubs.html">See all</a>
       </div>
       <div class="grid grid-3" id="homeClubs"></div>
     </div>
   </section>
-
   <section style="padding-top:0">
     <div class="container">
       <div class="section-head">
-        <div>
-          <p class="kicker">Calendar</p>
-          <h2>Pick a marked night</h2>
-        </div>
+        <div><p class="kicker">Calendar</p><h2>Pick a marked night</h2></div>
       </div>
-      <p class="meta" style="margin:-12px 0 16px">Orange dates par click — customer details page khulegi.</p>
       <div class="ads-cal" id="homeCal"></div>
     </div>
   </section>
-
-  <section style="padding-top:0">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <p class="kicker">Deals</p>
-          <h2>Tonight's Offers</h2>
-        </div>
-        <a class="btn btn-ghost" href="pages/offers.html">All offers</a>
-      </div>
-      <div class="grid grid-3" id="homeOffers"></div>
-    </div>
-  </section>
-
-  <section class="plan-section">
-    <div class="container plan-grid">
-      <div>
-        <p class="kicker">Safe night</p>
-        <h2>Go out with a plan</h2>
-        <p class="lead" style="color:var(--muted);margin:12px 0 18px;max-width:46ch">Club jaane se pehle venue check karo, kisi trusted contact ko plan bhejo, aur emergency number save rakho. Yeh section sirf official helplines use karta hai.</p>
-        <div class="helpline-row">
-          <a href="tel:112">112 Emergency</a>
-          <a href="tel:1091">1091 Women</a>
-          <a href="tel:108">108 Ambulance</a>
-          <a href="tel:100">100 Police</a>
-        </div>
-        <div class="card-actions" style="margin-top:18px">
-          <a class="btn btn-primary" href="pages/safety.html">Open safety guide</a>
-          <a class="btn btn-ghost" href="pages/list-event.html">Add your event</a>
-        </div>
-      </div>
-      <div class="grid" style="gap:12px">
-        <article class="card" style="padding:16px"><h3>Verified rooms</h3><p class="meta" style="margin-top:8px">Green pill = hours, cover and a manager contact were confirmed before listing.</p></article>
-        <article class="card" style="padding:16px"><h3>Share your night</h3><p class="meta" style="margin-top:8px">Booking form mein emergency contact add karo taaki koi jaane aap kahan ho.</p></article>
-        <article class="card" style="padding:16px"><h3>Report a venue</h3><p class="meta" style="margin-top:8px">Galat listing ya unsafe door? Safety page se flag karo. Danger ho to pehle 112.</p></article>
-      </div>
-    </div>
-  </section>
-
   <section id="cities" style="padding-top:0">
     <div class="container">
       <div class="section-head">
-        <div>
-          <p class="kicker">Destinations</p>
-          <h2>Explore Nightlife by City</h2>
-        </div>
+        <div><p class="kicker">Destinations</p><h2>Explore Nightlife by City</h2></div>
       </div>
       <div class="grid grid-3" id="homeCities"></div>
     </div>
   </section>
-
   <div id="chrome-footer"></div>
-  <script src="js/data.js"></script>
-  <script src="js/app.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
   <script>
     document.getElementById("chrome-header").innerHTML = npHeader("home");
     document.getElementById("chrome-footer").innerHTML = npFooter();
     bindChrome();
     const city = NP.getCity() || "all";
     const heroCity = document.getElementById("heroCity");
-    heroCity.innerHTML = `<option value="all">All Cities</option><option value="ncr">NCR</option>` + NP_DATA.cities.map(c => `<option value="${c.id}" ${c.id===city?"selected":""}>${c.name}</option>`).join("");
-    function paintHome(cid) {
-      document.getElementById("homeCities").innerHTML = NP_DATA.cities.map(cityCard).join("");
-      document.getElementById("homeClubs").innerHTML = filterClubs({ city: cid || "all" }).map(clubCard).join("");
-    }
-    paintHome(city);
-    heroCity.addEventListener("change", () => {
-      NP.setCity(heroCity.value);
-      paintHome(heroCity.value);
-    });
-    (function cal() {
-      const box = document.getElementById("homeCal");
-      const now = new Date();
-      const y = now.getFullYear(), m = now.getMonth();
-      const first = new Date(y, m, 1).getDay();
-      const days = new Date(y, m + 1, 0).getDate();
-      const marked = {};
-      npAllEvents().forEach(ev => {
-        const d = npEventDate(ev.dateOffset);
-        marked[d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")] = true;
-      });
-      [5,6,12,13,19,20,26,27].forEach(n => {
-        if (n <= days) marked[y+"-"+String(m+1).padStart(2,"0")+"-"+String(n).padStart(2,"0")] = true;
-      });
-      let html = "<div class='ads-cal-head'>S M T W T F S</div><div class='ads-cal-grid'>";
-      for (let i = 0; i < first; i++) html += "<span></span>";
-      for (let d = 1; d <= days; d++) {
-        const key = y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
-        if (marked[key]) html += `<a class="ads-cal-mark" href="pages/book-date.html?date=${key}">${d}</a>`;
-        else html += `<span>${d}</span>`;
-      }
-      box.innerHTML = html + "</div>";
-    })();
-    document.getElementById("homeOffers").innerHTML = npAllOffers().slice(0,3).map(o => {
-      const club = npClub(o.clubId);
-      return `<article class="card offer-card">
-        <div class="tag">${o.tag}</div>
-        <h3 style="margin:8px 0">${o.title}</h3>
-        <p class="meta">${club.name} · ${npCityName(club.city)}</p>
-        <p>${o.details}</p>
-        <p class="meta">${o.valid}</p>
-        <a class="btn btn-primary" href="pages/offers.html">View Offer</a>
-      </article>`;
-    }).join("");
+    heroCity.innerHTML = '<option value="all">All Cities</option><option value="ncr">NCR</option>' + NP_DATA.cities.map(c => '<option value="'+c.id+'" '+(c.id===city?'selected':'')+'>'+c.name+'</option>').join("");
     document.getElementById("homeCities").innerHTML = NP_DATA.cities.map(cityCard).join("");
-    document.getElementById("heroForm").addEventListener("submit", e => {
+    document.getElementById("homeClubs").innerHTML = filterClubs({ city: city }).map(clubCard).join("");
+    heroCity.onchange = function(){ NP.setCity(heroCity.value); location.reload(); };
+    (function(){
+      var box = document.getElementById("homeCal");
+      var now = new Date(), y = now.getFullYear(), m = now.getMonth();
+      var first = new Date(y,m,1).getDay(), days = new Date(y,m+1,0).getDate();
+      var html = "<div class='ads-cal-head'>S M T W T F S</div><div class='ads-cal-grid'>";
+      for (var i=0;i<first;i++) html += "<span></span>";
+      for (var d=1;d<=days;d++){
+        var key = y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+        if ([5,6,12,13,19,20,26,27].indexOf(d)>=0)
+          html += '<a class="ads-cal-mark" href="book-date.html?date='+key+'">'+d+'</a>';
+        else html += "<span>"+d+"</span>";
+      }
+      box.innerHTML = html+"</div>";
+    })();
+    document.getElementById("heroForm").onsubmit = function(e){
       e.preventDefault();
       NP.setCity(heroCity.value);
-      const q = encodeURIComponent(document.getElementById("heroQ").value);
-      location.href = `pages/clubs.html?q=${q}&city=${heroCity.value}`;
-    });
+      location.href = "clubs.html?city="+heroCity.value;
+    };
   </script>
 </body>
 </html>
