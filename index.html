@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>After Dark Society</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="chrome-header"></div>
+  <section class="hero">
+    <div class="hero-media">
+      <video autoplay muted loop playsinline poster="media/hero-crowd.mp4">
+        <source src="media/hero-crowd.mp4" type="video/mp4" />
+      </video>
+    </div>
+    <div class="hero-content">
+      <p class="kicker">After Dark Society</p>
+      <h1>Your Night.<br>Your Rules.</h1>
+      <p class="lead">Discover the best clubs, parties, DJs and nightlife events happening near you.</p>
+      <form class="hero-search" id="heroForm">
+        <select id="heroCity"></select>
+        <input id="heroQ" placeholder="Search clubs, DJs, parties..." />
+        <button class="btn btn-primary" type="submit">Explore Tonight</button>
+      </form>
+      <div class="stats">
+        <div><strong>500+</strong>Clubs</div>
+        <div><strong>1,000+</strong>Events</div>
+        <div><strong>50+</strong>Cities</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="kicker">Venues</p>
+          <h2>Explore Clubs</h2>
+        </div>
+        <a class="btn btn-ghost" href="pages/clubs.html">See all</a>
+      </div>
+      <div class="grid grid-3" id="homeClubs"></div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="kicker">Live calendar</p>
+          <h2>What's Happening Tonight?</h2>
+        </div>
+        <a class="btn btn-ghost" href="pages/events.html">All events</a>
+      </div>
+      <div class="filters" id="homeTags"></div>
+      <div class="grid grid-3" id="homeEvents"></div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="kicker">Deals</p>
+          <h2>Tonight's Offers</h2>
+        </div>
+        <a class="btn btn-ghost" href="pages/offers.html">All offers</a>
+      </div>
+      <div class="grid grid-3" id="homeOffers"></div>
+    </div>
+  </section>
+
+  <section class="plan-section">
+    <div class="container plan-grid">
+      <div>
+        <p class="kicker">Safe night</p>
+        <h2>Go out with a plan</h2>
+        <p class="lead" style="color:var(--muted);margin:12px 0 18px;max-width:46ch">Club jaane se pehle venue check karo, kisi trusted contact ko plan bhejo, aur emergency number save rakho. Yeh section sirf official helplines use karta hai.</p>
+        <div class="helpline-row">
+          <a href="tel:112">112 Emergency</a>
+          <a href="tel:1091">1091 Women</a>
+          <a href="tel:108">108 Ambulance</a>
+          <a href="tel:100">100 Police</a>
+        </div>
+        <div class="card-actions" style="margin-top:18px">
+          <a class="btn btn-primary" href="pages/safety.html">Open safety guide</a>
+          <a class="btn btn-ghost" href="pages/list-event.html">Add your event</a>
+        </div>
+      </div>
+      <div class="grid" style="gap:12px">
+        <article class="card" style="padding:16px"><h3>Verified rooms</h3><p class="meta" style="margin-top:8px">Green pill = hours, cover and a manager contact were confirmed before listing.</p></article>
+        <article class="card" style="padding:16px"><h3>Share your night</h3><p class="meta" style="margin-top:8px">Booking form mein emergency contact add karo taaki koi jaane aap kahan ho.</p></article>
+        <article class="card" style="padding:16px"><h3>Report a venue</h3><p class="meta" style="margin-top:8px">Galat listing ya unsafe door? Safety page se flag karo. Danger ho to pehle 112.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="kicker">Destinations</p>
+          <h2>Explore Nightlife by City</h2>
+        </div>
+      </div>
+      <div class="grid grid-3" id="homeCities"></div>
+    </div>
+  </section>
+
+  <div id="chrome-footer"></div>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById("chrome-header").innerHTML = npHeader("home");
+    document.getElementById("chrome-footer").innerHTML = npFooter();
+    bindChrome();
+    const city = NP.getCity();
+    const heroCity = document.getElementById("heroCity");
+    heroCity.innerHTML = `<option value="all">All Cities</option>` + NP_DATA.cities.map(c => `<option value="${c.id}" ${c.id===city?"selected":""}>${c.name}</option>`).join("");
+    document.getElementById("homeCities").innerHTML = NP_DATA.cities.map(cityCard).join("");
+    document.getElementById("homeClubs").innerHTML = filterClubs({ city }).map(clubCard).join("");
+    const tags = ["Tonight","Tomorrow","This Weekend","DJ Night","Bollywood","EDM","Hip-Hop","Techno","Live Music","Ladies Night","Couple Entry","Free Entry"];
+    const tagBox = document.getElementById("homeTags");
+    tagBox.innerHTML = tags.map((t,i)=>`<button class="chip ${i===0?"active":""}" data-tag="${t}">${t}</button>`).join("");
+    function renderHomeEvents(tag) {
+      document.getElementById("homeEvents").innerHTML = filterEvents({ city, tag }).slice(0,6).map(eventCard).join("") || "<p class='meta'>No events in this filter. Try another city or tag.</p>";
+    }
+    renderHomeEvents("Tonight");
+    tagBox.addEventListener("click", e => {
+      const b = e.target.closest(".chip"); if (!b) return;
+      tagBox.querySelectorAll(".chip").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      renderHomeEvents(b.dataset.tag);
+    });
+    document.getElementById("homeOffers").innerHTML = npAllOffers().slice(0,3).map(o => {
+      const club = npClub(o.clubId);
+      return `<article class="card offer-card">
+        <div class="tag">${o.tag}</div>
+        <h3 style="margin:8px 0">${o.title}</h3>
+        <p class="meta">${club.name} · ${npCityName(club.city)}</p>
+        <p>${o.details}</p>
+        <p class="meta">${o.valid}</p>
+        <a class="btn btn-primary" href="pages/offers.html">View Offer</a>
+      </article>`;
+    }).join("");
+    document.getElementById("homeCities").innerHTML = NP_DATA.cities.map(cityCard).join("");
+    document.getElementById("heroForm").addEventListener("submit", e => {
+      e.preventDefault();
+      NP.setCity(heroCity.value);
+      const q = encodeURIComponent(document.getElementById("heroQ").value);
+      location.href = `pages/clubs.html?q=${q}&city=${heroCity.value}`;
+    });
+  </script>
+</body>
+</html>

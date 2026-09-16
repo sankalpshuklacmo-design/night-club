@@ -1,0 +1,24 @@
+After Dark Society — backend
+
+Local:
+  cd nightpulse
+  npm start
+  Browser: js/config.js mein apiBase: "http://localhost:8787"
+
+API
+  GET  /api/health
+  GET  /api/events
+  GET  /api/clubs
+  GET  /api/bookings
+  POST /api/events
+  POST /api/clubs
+  POST /api/bookings
+  POST /api/pay/order     needs RAZORPAY_KEY_ID + RAZORPAY_KEY_SECRET env
+
+Razorpay live orders:
+  RAZORPAY_KEY_ID=rzp_test_xxx RAZORPAY_KEY_SECRET=xxx npm start
+
+Netlify drag-drop functions kabhi-kabhi on nahi hoti.
+Durable DB ke liye isi server ko Railway / Render par chalao, phir apiBase woh URL set karo.
+
+Bookings file: server/db.json
