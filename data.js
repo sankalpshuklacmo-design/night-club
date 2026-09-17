@@ -369,7 +369,7 @@ function npRemoveOffer(id) {
 function npAllOffers() {
   const gone = npDeletedIds("np_deleted_offers");
   const ov = npOverrides("np_offer_edits");
-  return NP_DATA.offers.concat(npUserOffers())
+  return npUserOffers()
     .filter(o => !gone.includes(o.id))
     .map(o => ov[o.id] ? Object.assign({}, o, ov[o.id]) : o);
 }
