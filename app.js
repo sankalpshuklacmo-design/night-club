@@ -2,12 +2,12 @@
   const p = location.pathname.includes("/pages/") ? "../" : "";
   if (!document.querySelector('script[src$="js/config.js"]')) {
     const c = document.createElement("script");
-    c.src = p + "js/config.js";
+    c.src = (location.hostname.indexOf("github.io") !== -1) ? "config.js" : (p + "js/config.js");
     document.head.appendChild(c);
   }
   if (!document.querySelector('script[src$="js/api.js"]')) {
     const a = document.createElement("script");
-    a.src = p + "js/api.js";
+    a.src = (location.hostname.indexOf("github.io") !== -1) ? "api.js" : (p + "js/api.js");
     document.head.appendChild(a);
   }
   if (!document.querySelector('script[src*="checkout.razorpay.com"]')) {
@@ -23,6 +23,17 @@ const NP = {
   qs(k) { return new URLSearchParams(location.search).get(k); },
   pathPrefix() {
     return location.pathname.includes("/pages/") ? "../" : "";
+  },
+  flat() {
+    return location.hostname.indexOf("github.io") !== -1;
+  },
+  pg(name) {
+    if (location.pathname.indexOf("/pages/") !== -1) return name;
+    return this.flat() ? name : ("pages/" + name);
+  },
+  cityPic(id) {
+    if (this.flat()) return id + ".jpg";
+    return this.pathPrefix() + "media/cities/" + id + ".jpg";
   }
 };
 
@@ -44,32 +55,32 @@ function npHeader(active) {
     <div class="container header-inner">
       <a class="logo" href="${p}index.html">AFTER<span>DARK</span></a>
       <nav class="nav">
-        <a class="${active==="clubs"?"active":""}" href="${p}pages/clubs.html">Clubs</a>
-        <a class="${active==="events"?"active":""}" href="${p}pages/events.html">Parties</a>
-        <a class="${active==="events"?"active":""}" href="${p}pages/events.html">DJs</a>
-        <a class="${active==="offers"?"active":""}" href="${p}pages/offers.html">Offers</a>
+        <a class="${active==="clubs"?"active":""}" href="${NP.pg("clubs.html")}">Clubs</a>
+        <a class="${active==="events"?"active":""}" href="${NP.pg("events.html")}">Parties</a>
+        <a class="${active==="events"?"active":""}" href="${NP.pg("events.html")}">DJs</a>
+        <a class="${active==="offers"?"active":""}" href="${NP.pg("offers.html")}">Offers</a>
         <a class="${active==="home"?"active":""}" href="${p}index.html#cities">Cities</a>
       </nav>
       <div class="header-actions">
         <select class="city-select" id="globalCity">${opts}</select>
         <button class="icon-btn" id="searchToggle" aria-label="Search">Search</button>
-        <a class="btn btn-primary hide-sm" href="${p}pages/list-club.html">List your club</a>
+        <a class="btn btn-primary hide-sm" href="${NP.pg("list-club.html")}">List your club</a>
         <button class="icon-btn hamburger" id="hamburger">☰</button>
       </div>
     </div>
   </header>
   <div class="mobile-nav" id="mobileNav">
     <a href="${p}index.html">Home</a>
-    <a href="${p}pages/clubs.html">Explore Clubs</a>
-    <a href="${p}pages/events.html">Parties & Events</a>
-    <a href="${p}pages/offers.html">Offers</a>
-    <a href="${p}pages/about.html">About</a>
-    <a href="${p}pages/safety.html">Safety</a>
-    <a href="${p}pages/list-event.html">List Your Event</a>
-    <a href="${p}pages/list-club.html">Add club</a>
-    <a href="${p}pages/admin.html">Admin + Razorpay</a>
-    <a href="${p}pages/edit.html">Edit venue / time</a>
-    <a href="${p}pages/dashboard.html">Owner dashboard</a>
+    <a href="${NP.pg("clubs.html")}">Explore Clubs</a>
+    <a href="${NP.pg("events.html")}">Parties & Events</a>
+    <a href="${NP.pg("offers.html")}">Offers</a>
+    <a href="${NP.pg("about.html")}">About</a>
+    <a href="${NP.pg("safety.html")}">Safety</a>
+    <a href="${NP.pg("list-event.html")}">List Your Event</a>
+    <a href="${NP.pg("list-club.html")}">Add club</a>
+    <a href="${NP.pg("admin.html")}">Admin + Razorpay</a>
+    <a href="${NP.pg("edit.html")}">Edit venue / time</a>
+    <a href="${NP.pg("dashboard.html")}">Owner dashboard</a>
     <label class="meta" style="display:block;margin:16px 0 8px">City</label>
     <select class="city-select" id="mobileCity" style="width:100%">${opts}</select>
   </div>`;
@@ -87,25 +98,25 @@ function npFooter() {
       </div>
       <div>
         <strong>Explore</strong>
-        <a href="${p}pages/about.html">About</a>
-        <a href="${p}pages/clubs.html">Explore Clubs</a>
-        <a href="${p}pages/events.html">Events</a>
-        <a href="${p}pages/offers.html">Offers</a>
-        <a href="${p}pages/safety.html">Nightlife Safety</a>
+        <a href="${NP.pg("about.html")}">About</a>
+        <a href="${NP.pg("clubs.html")}">Explore Clubs</a>
+        <a href="${NP.pg("events.html")}">Events</a>
+        <a href="${NP.pg("offers.html")}">Offers</a>
+        <a href="${NP.pg("safety.html")}">Nightlife Safety</a>
       </div>
       <div>
         <strong>Partners</strong>
-        <a href="${p}pages/admin.html">Admin + Razorpay</a>
-        <a href="${p}pages/list-event.html">List Your Event</a>
-        <a href="${p}pages/list-club.html">List Your Club</a>
-        <a href="${p}pages/edit.html">Edit listings</a>
-        <a href="${p}pages/dashboard.html">Owner Dashboard</a>
-        <a href="${p}pages/about.html#contact">Contact</a>
+        <a href="${NP.pg("admin.html")}">Admin + Razorpay</a>
+        <a href="${NP.pg("list-event.html")}">List Your Event</a>
+        <a href="${NP.pg("list-club.html")}">List Your Club</a>
+        <a href="${NP.pg("edit.html")}">Edit listings</a>
+        <a href="${NP.pg("dashboard.html")}">Owner Dashboard</a>
+        <a href="${NP.pg("about.html")}#contact">Contact</a>
       </div>
       <div>
         <strong>Legal & Social</strong>
-        <a href="${p}pages/privacy.html">Privacy Policy</a>
-        <a href="${p}pages/terms.html">Terms & Conditions</a>
+        <a href="${NP.pg("privacy.html")}">Privacy Policy</a>
+        <a href="${NP.pg("terms.html")}">Terms & Conditions</a>
         <a href="https://instagram.com" target="_blank">Instagram</a>
         <a href="https://facebook.com" target="_blank">Facebook</a>
         <a href="https://youtube.com" target="_blank">YouTube</a>
@@ -173,7 +184,7 @@ function bindChrome() {
   const st = document.getElementById("searchToggle");
   if (st) st.addEventListener("click", () => {
     const p = NP.pathPrefix();
-    location.href = p + "pages/clubs.html?focus=1";
+    location.href = NP.pg("clubs.html") + "?focus=1";
   });
   const close = document.getElementById("closeBook");
   if (close) close.onclick = () => document.getElementById("bookModal").classList.remove("open");
@@ -363,7 +374,7 @@ function clubCard(c) {
         ${c.safety ? `<span class="safety-pill">Safety ${c.safety.safetyScore}</span>` : ""}
       </div>
       <div class="card-actions">
-        <a class="btn btn-ghost" href="${p}pages/club.html?id=${c.id}">View Club</a>
+        <a class="btn btn-ghost" href="${NP.pg("club.html")}?id=${c.id}">View Club</a>
         <button class="btn btn-primary" data-book="${c.name}" data-amount="${c.entry}">Book & pay</button>
       </div>
     </div>
@@ -392,7 +403,7 @@ function eventCard(ev) {
         <span>${ev.interested.toLocaleString("en-IN")} interested</span>
       </div>
       <div class="card-actions">
-        <a class="btn btn-ghost" href="${p}pages/event.html?id=${ev.id}">View Event</a>
+        <a class="btn btn-ghost" href="${NP.pg("event.html")}?id=${ev.id}">View Event</a>
         <button class="btn btn-primary" data-book="${ev.name}" data-amount="${ev.price}">Pay & book</button>
       </div>
     </div>
@@ -401,8 +412,8 @@ function eventCard(ev) {
 
 function cityCard(c) {
   const p = NP.pathPrefix();
-  const src = p + "media/cities/" + c.id + ".jpg";
-  return `<a class="card city-card" href="${p}pages/clubs.html?city=${c.id}" onclick="NP.setCity('${c.id}')">
+  const src = NP.cityPic(c.id);
+  return `<a class="card city-card" href="${NP.pg("clubs.html")}?city=${c.id}" onclick="NP.setCity('${c.id}')">
     <div class="card-media"><img src="${src}" alt="${c.name}"></div>
     <div class="card-body">
       <h3>${c.name}</h3>
