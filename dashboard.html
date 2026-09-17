@@ -4,20 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Owner Dashboard — After Dark Society</title>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/styles.css" />
-<script>
-(function(){
-  var gh = location.hostname.indexOf("github.io") !== -1;
-  var css = document.querySelector('link[href*="styles.css"]');
-  if (css) css.href = gh ? "styles.css" : (location.pathname.indexOf("/pages/")>=0 ? "../css/styles.css" : "css/styles.css");
-})();
-</script>
-
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Manrope:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div id="dashGate"></div>
-  <div class="dash" id="dashDesk" style="display:none">
+  <div class="dash">
     <aside class="dash-side">
       <a class="logo" href="index.html">AFTER<span>DARK</span></a>
       <p class="meta" style="margin:12px 0 18px">Club owner</p>
@@ -35,95 +26,58 @@
     </aside>
     <main class="dash-main">
       <h2>Club Mirage dashboard</h2>
-      <p class="meta" style="margin-bottom:18px">Demo owner panel. Wire these forms to Clubs, ClubHours, Events, DJs, Offers, Bookings APIs later.</p>
+      <p class="meta" style="margin-bottom:18px">Owner panel — club, hours, events, bookings, prices.</p>
       <div class="kpi">
         <div><span class="meta">Tonight covers</span><strong>186</strong></div>
         <div><span class="meta">Open tables</span><strong>11 VIP</strong></div>
         <div><span class="meta">Week revenue</span><strong>₹4.2L</strong></div>
         <div><span class="meta">Profile views</span><strong>9,418</strong></div>
       </div>
-
       <div id="info" class="card" style="padding:18px;margin-bottom:16px">
-        <h3>Add / edit club information</h3>
+        <h3>Club information</h3>
         <div class="form-row" style="margin-top:12px"><label>Club name</label><input value="Club Mirage"></div>
-        <div class="form-row"><label>Address</label><input value="TC-34, Vibhuti Khand, Gomti Nagar, Lucknow"></div>
-        <div class="form-row"><label>Music genres</label><input value="EDM, Bollywood, Commercial"></div>
-        <button class="btn btn-primary">Save club</button>
+        <div class="form-row"><label>Address</label><input value="Gomti Nagar, Lucknow"></div>
+        <div class="form-row"><label>Music</label><input value="EDM, Bollywood"></div>
+        <button class="btn btn-primary" type="button">Save club</button>
       </div>
-
       <div id="photos" class="card" style="padding:18px;margin-bottom:16px">
-        <h3>Upload club photos</h3>
-        <p class="meta">Drop cover + gallery assets. Max 12 images in the production API.</p>
-        <button class="btn btn-ghost" style="margin-top:10px">Upload photos</button>
+        <h3>Photos</h3>
+        <button class="btn btn-ghost" type="button">Upload photos</button>
       </div>
-
       <div id="hours" class="card" style="padding:18px;margin-bottom:16px">
         <h3>Opening hours</h3>
-        <p class="meta">Mon 21:00–03:00 · Tue Closed · Wed–Thu 21:00–03:00 · Fri–Sat 21:00–04:00 · Sun 20:00–02:00</p>
-        <button class="btn btn-ghost" style="margin-top:10px">Edit hours</button>
+        <p class="meta">Fri–Sat 21:00–04:00 · Sun 20:00–02:00</p>
+        <button class="btn btn-ghost" type="button">Edit hours</button>
       </div>
-
       <div id="events" class="card" style="padding:18px;margin-bottom:16px">
-        <h3>Add upcoming events</h3>
-        <div class="form-row" style="margin-top:12px"><label>Event name</label><input placeholder="Neon Fridays"></div>
-        <div class="form-row"><label>DJ / artist</label><input placeholder="DJ Arjun"></div>
-        <button class="btn btn-primary">Publish event</button>
+        <h3>Upcoming events</h3>
+        <div class="form-row"><label>Event</label><input placeholder="Neon Fridays"></div>
+        <button class="btn btn-primary" type="button">Publish event</button>
       </div>
-
       <div id="djs" class="card" style="padding:18px;margin-bottom:16px">
-        <h3>Resident DJs</h3>
-        <p class="meta">DJ Arjun · DJ Rhea · Guest: Luna Pulse</p>
+        <h3>DJs</h3>
+        <p class="meta">DJ Arjun · DJ Rhea</p>
       </div>
-
       <div id="offers" class="card" style="padding:18px;margin-bottom:16px">
-        <h3>Create offer</h3>
-        <div class="form-row" style="margin-top:12px"><label>Title</label><input placeholder="Early Bird 50%"></div>
-        <button class="btn btn-primary">Create offer</button>
+        <h3>Offers</h3>
+        <div class="form-row"><label>Title</label><input placeholder="Ladies night"></div>
+        <button class="btn btn-primary" type="button">Create offer</button>
       </div>
-
       <div id="bookings" class="card" style="padding:18px;margin-bottom:16px">
-        <h3>Manage table bookings</h3>
-        <p class="meta">Tonight: Booth A4 — Riya S. party of 6 · VIP 2 — Kabir M. party of 8 · Waitlist 4</p>
-        <button class="btn btn-ghost" style="margin-top:10px">See bookings</button>
+        <h3>Table bookings</h3>
+        <p class="meta">VIP 2 — party of 8 · Booth A4 — party of 6</p>
       </div>
-
       <div id="pricing" class="card" style="padding:18px;margin-bottom:16px">
-        <h3>Update entry prices</h3>
-        <div class="form-row" style="margin-top:12px"><label>Stag cover</label><input value="1500"></div>
-        <div class="form-row"><label>Couple cover</label><input value="1999"></div>
-        <button class="btn btn-primary">Update prices</button>
+        <h3>Entry prices</h3>
+        <div class="form-row"><label>Stag</label><input value="1500"></div>
+        <div class="form-row"><label>Couple</label><input value="1999"></div>
+        <button class="btn btn-primary" type="button">Update prices</button>
       </div>
-
       <div id="analytics" class="card" style="padding:18px">
-        <h3>Basic analytics</h3>
-        <p class="meta">Peak hour 23:40 · Most booked table: Booth · Top campaign: Ladies Night Friday</p>
+        <h3>Analytics</h3>
+        <p class="meta">Peak 23:40 · Top table: Booth</p>
       </div>
     </main>
   </div>
-  <script>
-(function(){
-  var gh = location.hostname.indexOf("github.io")!==-1;
-  document.write('<script src="'+(gh?"data.js":"../js/data.js")+'"><\/script>');
-  document.write('<script src="'+(gh?"app.js":"../js/app.js")+'"><\/script>');
-})();
-</script>
-
-  <script>
-(function(){
-  var gh = location.hostname.indexOf("github.io")!==-1;
-  document.write('<script src="'+(gh?"data.js":"../js/data.js")+'"><\/script>');
-  document.write('<script src="'+(gh?"app.js":"../js/app.js")+'"><\/script>');
-})();
-</script>
-
-  <script src="auth.js"></script>
-  <script>
-    document.getElementById("dashGate").innerHTML = npAuthHtml("Owner dashboard login");
-    function openDesk() {
-      document.getElementById("dashGate").style.display = "none";
-      document.getElementById("dashDesk").style.display = "";
-    }
-    npAuthBind(openDesk);
-  </script>
 </body>
 </html>
