@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Night details — After Dark Society</title>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="chrome-header"></div>
@@ -37,21 +37,15 @@
     </div>
   </section>
   <div id="chrome-footer"></div>
-  <script>
-(function(){
-  var gh = location.hostname.indexOf("github.io")!==-1;
-  document.write('<script src="'+(gh?"data.js":"../js/data.js")+'"><\/script>');
-  document.write('<script src="'+(gh?"app.js":"../js/app.js")+'"><\/script>');
-})();
-</script>
-
+  <script src="data.js"></script>
+  <script src="app.js"></script>
   <script>
     document.getElementById("chrome-header").innerHTML = npHeader("home");
     document.getElementById("chrome-footer").innerHTML = npFooter();
     bindChrome();
-    const date = new URLSearchParams(location.search).get("date") || new Date().toISOString().slice(0,10);
+    const date = new URLSearchParams(location.search).get("date") || "";
     document.getElementById("dateTitle").textContent = "Night of " + date;
-    document.getElementById("dateSub").textContent = "Yeh date calendar par marked hai. Details bharo.";
+    document.getElementById("dateSub").textContent = "Marked date. Details bharo.";
     function sync() {
       const p = Math.max(1, Number(document.getElementById("dPeople").value || 1));
       const sel = document.getElementById("dService");
@@ -61,7 +55,7 @@
     document.getElementById("dPeople").oninput = sync;
     document.getElementById("dService").onchange = sync;
     sync();
-    document.getElementById("dateForm").onsubmit = e => {
+    document.getElementById("dateForm").onsubmit = function(e) {
       e.preventDefault();
       document.getElementById("bkName").value = document.getElementById("dName").value;
       document.getElementById("bkPhone").value = document.getElementById("dPhone").value;
