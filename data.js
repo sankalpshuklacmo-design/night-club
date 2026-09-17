@@ -314,7 +314,7 @@ function applyOverrides(list, storeKey) {
 }
 function npAllClubs(includePending) {
   const gone = npDeletedIds("np_deleted_clubs");
-  const list = applyOverrides(NP_DATA.clubs.concat(npUserClubs()), "np_club_edits")
+  const list = applyOverrides(npUserClubs(), "np_club_edits")
     .filter(c => !gone.includes(c.id));
   if (includePending) return list;
   return list.filter(c => c.approved !== false);
