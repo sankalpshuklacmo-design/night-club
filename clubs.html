@@ -48,4 +48,61 @@
         <div class="svc-item"><label><input type="checkbox" class="svc" data-price="8000"> c) 2 female dance partners</label><span>₹8,000</span></div>
         <div class="svc-item"><label><input type="checkbox" class="svc" data-price="2500"> d) One bucket beer</label><span>₹2,500</span></div>
         <div class="svc-item"><label><input type="checkbox" class="svc" data-price="2000"> e) Fire gun shot</label><span>₹2,000</span></div>
-        <div class="svc-item"><label><input 
+        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="5000"> f) Bouncer / escort</label><span>₹5,000</span></div>
+        <div class="svc-item"><label><input type="checkbox" id="svcPack"> g) All pack</label><span>₹25,000</span></div>
+        <div class="pay-bar">
+          <div>
+            <p class="meta" id="priceLine">₹1,500 × 1</p>
+            <strong id="grand">₹1,500</strong>
+          </div>
+          <button class="btn btn-primary" type="button" id="payNow">Pay with Razorpay</button>
+        </div>
+      </div>
+      <div class="grid grid-3" id="list" style="margin-top:28px"></div>
+    </div>
+  </section>
+  <div id="chrome-footer"></div>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    document.getElementById("chrome-header").innerHTML = npHeader("clubs");
+    document.getElementById("chrome-footer").innerHTML = npFooter();
+    bindChrome();
+    var city = NP.qs("city") || NP.getCity() || "all";
+    var fCity = document.getElementById("fCity");
+    fCity.innerHTML = '<option value="all">All Cities</option><option value="ncr">NCR</option>' +
+      NP_DATA.cities.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join("");
+    fCity.value = city;
+    function extra() {
+      if (document.getElementById("svcPack").checked) {
+        document.querySelectorAll(".svc").forEach(function(c){ c.checked = true; });
+        return 25000;
+      }
+      var n = 0;
+      document.querySelectorAll(".svc").forEach(function(c){ if (c.checked) n += Number(c.dataset.price); });
+      return n;
+    }
+    function totals() {
+      var people = Math.max(1, Number(document.getElementById("fPeople").value || 1));
+      var svc = extra();
+      var cover = svc > 0 ? 0 : 1500 * people;
+      var grand = cover + svc;
+      document.getElementById("priceLine").textContent = svc ? ("Service ₹" + svc) : ("₹1,500 × " + people);
+      document.getElementById("grand").textContent = "₹" + grand;
+      return grand;
+    }
+    function render() {
+      totals();
+      var v = document.getElementById("fArea").value === "ncr" ? "ncr" : fCity.value;
+      document.getElementById("list").innerHTML = filterClubs({ city: v, q: document.getElementById("fQ").value }).map(clubCard).join("");
+    }
+    document.querySelectorAll("input, select").forEach(function(el){ el.addEventListener("change", render); el.addEventListener("input", render); });
+    document.getElementById("payNow").onclick = function(){
+      document.getElementById("bkPeople").value = document.getElementById("fPeople").value;
+      document.getElementById("bkAmount").value = totals();
+      document.getElementById("bookModal").classList.add("open");
+    };
+    render();
+  </script>
+</body>
+</html>
