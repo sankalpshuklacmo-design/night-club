@@ -74,7 +74,7 @@
       for (var d=1;d<=days;d++){
         var key = y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
         if ([5,6,12,13,19,20,26,27].indexOf(d)>=0)
-          html += '<a class="ads-cal-mark" href="book-date.html?date='+key+'">'+d+'</a>';
+          html += '<a class="ads-cal-mark" href="book-date.html.html?date='+key+'">'+d+'</a>';
         else html += "<span>"+d+"</span>";
       }
       box.innerHTML = html+"</div>";
