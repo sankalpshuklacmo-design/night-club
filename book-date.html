@@ -3,37 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Night details — After Dark Society</title>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <title>Marked night — After Dark Society</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Manrope:wght@400;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .svc-box { margin-top:18px;padding:18px;border:1px solid #2a2a2a;border-radius:14px;background:#101010 }
+    .svc-item { display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #222 }
+    .svc-item label { display:flex;gap:10px;align-items:center;font-weight:700;cursor:pointer }
+    .pay-bar { display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;margin-top:16px }
+    .pay-bar strong { font-size:1.4rem;color:#ff5a00 }
+  </style>
 </head>
 <body>
   <div id="chrome-header"></div>
   <section>
-    <div class="container" style="max-width:640px">
-      <p class="kicker">Marked night</p>
-      <h2 id="dateTitle">Customer details</h2>
-      <p class="meta" id="dateSub" style="margin:8px 0 20px"></p>
-      <form class="card" style="padding:22px" id="dateForm">
-        <div class="form-row"><label>Name</label><input required id="dName"></div>
-        <div class="form-row"><label>WhatsApp</label><input required id="dPhone" type="tel" placeholder="+91"></div>
-        <div class="form-row"><label>No. of persons</label><input required id="dPeople" type="number" min="1" value="2"></div>
-        <div class="form-row"><label>Special service</label>
-          <select id="dService">
-            <option value="0" data-price="0">None</option>
-            <option value="table" data-price="3000">Dedicated Table</option>
-            <option value="screen" data-price="1500">Name on the screen</option>
-            <option value="dance" data-price="8000">2 female dance partners</option>
-            <option value="beer" data-price="2500">One bucket beer</option>
-            <option value="fire" data-price="2000">Fire gun shot</option>
-            <option value="escort" data-price="5000">Bouncer / escort</option>
-            <option value="pack" data-price="25000">Package ₹25,000</option>
-          </select>
+    <div class="container" style="max-width:720px">
+      <p class="kicker">Pick a marked night</p>
+      <h2 id="dateTitle">Night details</h2>
+      <div class="filter-panel" style="margin-top:16px">
+        <div><label>No. of persons</label><input id="dPeople" type="number" min="1" value="1"></div>
+        <div><label>Name</label><input id="dName"></div>
+        <div><label>WhatsApp</label><input id="dPhone" type="tel" placeholder="+91"></div>
+      </div>
+      <div class="svc-box">
+        <h3>Special services</h3>
+        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="3000"> a) Dedicated Table</label><span>₹3,000</span></div>
+        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="8000"> b) 2 female dance partners</label><span>₹8,000</span></div>
+        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="2500"> c) One bucket beer</label><span>₹2,500</span></div>
+        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="2000"> d) Fire gun shot</label><span>₹2,000</span></div>
+        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="5000"> e) Bouncer / escort</label><span>₹5,000</span></div>
+        <div class="svc-item"><label><input type="checkbox" id="svcPack"> f) All pack</label><span>₹25,000</span></div>
+        <div class="pay-bar">
+          <div>
+            <p class="meta" id="priceLine">₹1,500 × 1</p>
+            <strong id="grand">₹1,500</strong>
+          </div>
+          <button class="btn btn-primary" type="button" id="payNow">Pay with Razorpay</button>
         </div>
-        <div class="form-row"><label>Advance (₹)</label><input id="dAmt" readonly></div>
-        <div class="form-row"><label>Special request</label><textarea id="dNote" rows="3"></textarea></div>
-        <button class="btn btn-primary" type="submit" style="width:100%">Continue to pay</button>
-      </form>
+      </div>
     </div>
   </section>
   <div id="chrome-footer"></div>
@@ -43,29 +50,37 @@
     document.getElementById("chrome-header").innerHTML = npHeader("home");
     document.getElementById("chrome-footer").innerHTML = npFooter();
     bindChrome();
-    const date = new URLSearchParams(location.search).get("date") || "";
-    document.getElementById("dateTitle").textContent = "Night of " + date;
-    document.getElementById("dateSub").textContent = "Marked date. Details bharo.";
-    function sync() {
-      const p = Math.max(1, Number(document.getElementById("dPeople").value || 1));
-      const sel = document.getElementById("dService");
-      const extra = Number(sel.options[sel.selectedIndex].dataset.price || 0);
-      document.getElementById("dAmt").value = sel.value === "pack" ? 25000 : 1500 * p + extra;
+    var date = new URLSearchParams(location.search).get("date") || "";
+    document.getElementById("dateTitle").textContent = date ? ("Night of " + date) : "Marked night";
+    function extra() {
+      if (document.getElementById("svcPack").checked) {
+        document.querySelectorAll(".svc").forEach(function(c){ c.checked = true; });
+        return 25000;
+      }
+      var n = 0;
+      document.querySelectorAll(".svc").forEach(function(c){ if (c.checked) n += Number(c.dataset.price); });
+      return n;
     }
-    document.getElementById("dPeople").oninput = sync;
-    document.getElementById("dService").onchange = sync;
-    sync();
-    document.getElementById("dateForm").onsubmit = function(e) {
-      e.preventDefault();
+    function totals() {
+      var people = Math.max(1, Number(document.getElementById("dPeople").value || 1));
+      var svc = extra();
+      var cover = svc > 0 ? 0 : 1500 * people;
+      var grand = cover + svc;
+      document.getElementById("priceLine").textContent = svc ? ("Service ₹" + svc) : ("₹1,500 × " + people);
+      document.getElementById("grand").textContent = "₹" + grand;
+      return grand;
+    }
+    document.getElementById("dPeople").oninput = totals;
+    document.querySelectorAll(".svc, #svcPack").forEach(function(el){ el.onchange = totals; });
+    document.getElementById("payNow").onclick = function(){
       document.getElementById("bkName").value = document.getElementById("dName").value;
       document.getElementById("bkPhone").value = document.getElementById("dPhone").value;
       document.getElementById("bkPeople").value = document.getElementById("dPeople").value;
       document.getElementById("bkDate").value = date;
-      document.getElementById("bkAmount").value = document.getElementById("dAmt").value;
-      document.getElementById("bkNote").value = document.getElementById("dNote").value;
-      document.getElementById("bookTarget").value = "Marked night " + date;
+      document.getElementById("bkAmount").value = totals();
       document.getElementById("bookModal").classList.add("open");
     };
+    totals();
   </script>
 </body>
 </html>
