@@ -9,9 +9,9 @@
   <style>
     .svc-box { margin-top: 18px; padding: 18px; border: 1px solid #2a2a2a; border-radius: 14px; background: #101010; }
     .svc-box h3 { font-family: Oswald, sans-serif; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 12px; }
-    .svc-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #222; }
+    .svc-item { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #222; }
     .svc-item label { display: flex; align-items: center; gap: 10px; font-weight: 700; cursor: pointer; }
-    .pay-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; padding-top: 14px; }
+    .pay-bar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 16px; }
     .pay-bar strong { font-size: 1.4rem; color: #ff5a00; }
   </style>
 </head>
@@ -38,92 +38,14 @@
             <option value="30">Within 30 km</option>
           </select>
         </div>
-        <div><label>No. of persons</label><input id="fPeople" type="number" min="1" value="2"></div>
+        <div><label>No. of persons</label><input id="fPeople" type="number" min="1" value="1"></div>
         <div><label>Search</label><input id="fQ" placeholder="Club, DJ..."></div>
       </div>
-
       <div class="svc-box">
         <h3>Special services — pick what you want</h3>
-        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="3000" data-name="Dedicated Table"> a) Dedicated Table</label><span>₹3,000</span></div>
-        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="1500" data-name="Name on the screen"> b) Name on the screen</label><span>₹1,500</span></div>
-        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="8000" data-name="2 female dance partners"> c) 2 female dance partners</label><span>₹8,000</span></div>
-        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="2500" data-name="One bucket beer"> d) One bucket beer</label><span>₹2,500</span></div>
-        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="2000" data-name="Fire gun shot"> e) Fire gun shot</label><span>₹2,000</span></div>
-        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="5000" data-name="Bouncer / escort"> f) Bouncer / escort</label><span>₹5,000</span></div>
-        <div class="svc-item"><label><input type="checkbox" id="svcPack"> g) All of the above pack</label><span>₹25,000</span></div>
-        <div class="pay-bar">
-          <div>
-            <p class="meta" id="priceLine">Cover ₹3,000</p>
-            <strong id="grand">₹3,000</strong>
-          </div>
-          <button class="btn btn-primary" type="button" id="payNow">Pay with Razorpay</button>
-        </div>
-      </div>
-
-      <div class="grid grid-3" id="list" style="margin-top:28px"></div>
-    </div>
-  </section>
-  <div id="chrome-footer"></div>
-  <script src="data.js"></script>
-  <script src="app.js"></script>
-  <script>
-    document.getElementById("chrome-header").innerHTML = npHeader("clubs");
-    document.getElementById("chrome-footer").innerHTML = npFooter();
-    bindChrome();
-    var city = NP.qs("city") || NP.getCity() || "all";
-    if (NP.qs("city")) NP.setCity(NP.qs("city"));
-    var fCity = document.getElementById("fCity");
-    fCity.innerHTML = '<option value="all">All Cities</option><option value="ncr">NCR</option>' +
-      NP_DATA.cities.map(function(c){ return '<option value="'+c.id+'"'+(c.id===city?' selected':'')+'>'+c.name+'</option>'; }).join("");
-    function selectedServices() {
-      var pack = document.getElementById("svcPack").checked;
-      var items = [];
-      var extra = 0;
-      document.querySelectorAll(".svc").forEach(function(cb){
-        if (pack) { cb.checked = true; extra = 25000; }
-        else if (cb.checked) { extra += Number(cb.dataset.price); items.push(cb.dataset.name); }
-      });
-      if (pack) extra = 25000;
-      return { extra: extra, items: pack ? ["All services pack"] : items };
-    }
-    function totals() {
-      var people = Math.max(1, Number(document.getElementById("fPeople").value || 1));
-      var cover = 1500 * people;
-      var s = selectedServices();
-      var grand = cover + s.extra;
-      document.getElementById("priceLine").textContent = "₹1,500 × " + people + " = ₹" + cover.toLocaleString("en-IN") +
-        (s.extra ? (" + services ₹" + s.extra.toLocaleString("en-IN")) : "");
-      document.getElementById("grand").textContent = "₹" + grand.toLocaleString("en-IN");
-      return grand;
-    }
-    function render() {
-      totals();
-      var cityVal = fCity.value;
-      if (document.getElementById("fArea").value === "ncr") cityVal = "ncr";
-      var list = filterClubs({ city: cityVal, q: document.getElementById("fQ").value });
-      document.getElementById("list").innerHTML = list.map(clubCard).join("") || "<p class='meta'>No clubs.</p>";
-    }
-    ["fCity","fArea","fKm","fPeople","fQ"].forEach(function(id){
-      document.getElementById(id).addEventListener("input", render);
-      document.getElementById(id).addEventListener("change", render);
-    });
-    document.querySelectorAll(".svc, #svcPack").forEach(function(el){
-      el.addEventListener("change", function(){
-        if (el.id !== "svcPack" && !el.checked) document.getElementById("svcPack").checked = false;
-        render();
-      });
-    });
-    document.getElementById("payNow").onclick = function(){
-      var amt = totals();
-      var s = selectedServices();
-      document.getElementById("bkPeople").value = document.getElementById("fPeople").value;
-      document.getElementById("bkAmount").value = amt;
-      document.getElementById("bkNote").value = s.items.join(", ");
-      document.getElementById("bookTarget").value = "Find a room";
-      document.getElementById("bkDate").value = new Date().toISOString().slice(0,10);
-      document.getElementById("bookModal").classList.add("open");
-    };
-    render();
-  </script>
-</body>
-</html>
+        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="3000"> a) Dedicated Table</label><span>₹3,000</span></div>
+        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="1500"> b) Name on the screen</label><span>₹1,500</span></div>
+        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="8000"> c) 2 female dance partners</label><span>₹8,000</span></div>
+        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="2500"> d) One bucket beer</label><span>₹2,500</span></div>
+        <div class="svc-item"><label><input type="checkbox" class="svc" data-price="2000"> e) Fire gun shot</label><span>₹2,000</span></div>
+        <div class="svc-item"><label><input 
