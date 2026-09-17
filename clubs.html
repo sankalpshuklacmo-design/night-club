@@ -5,15 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Explore Tonight — After Dark Society</title>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/styles.css" />
-<script>
-(function(){
-  var gh = location.hostname.indexOf("github.io") !== -1;
-  var css = document.querySelector('link[href*="styles.css"]');
-  if (css) css.href = gh ? "styles.css" : (location.pathname.indexOf("/pages/")>=0 ? "../css/styles.css" : "css/styles.css");
-})();
-</script>
-
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="chrome-header"></div>
@@ -21,7 +13,6 @@
     <div class="container">
       <p class="kicker">Explore tonight</p>
       <h2>Find a room</h2>
-      <p class="meta" style="margin:8px 0 20px">Area, persons, cover and special services.</p>
       <div class="filter-panel">
         <div><label>City</label><select id="fCity"></select></div>
         <div><label>Area</label>
@@ -44,92 +35,54 @@
         <div><label>Special service</label>
           <select id="fService">
             <option value="0" data-price="0">None</option>
-            <option value="table" data-price="3000">Dedicated Table</option>
-            <option value="screen" data-price="1500">Name on the screen</option>
-            <option value="dance" data-price="8000">2 female dance partners</option>
-            <option value="beer" data-price="2500">One bucket beer</option>
-            <option value="fire" data-price="2000">Fire gun shot</option>
-            <option value="escort" data-price="5000">Bouncer / escort service</option>
-            <option value="pack" data-price="25000">Total package ₹25,000</option>
+            <option value="table" data-price="3000">a) Dedicated Table — ₹3,000</option>
+            <option value="screen" data-price="1500">b) Name on the screen — ₹1,500</option>
+            <option value="dance" data-price="8000">c) 2 female dance partners — ₹8,000</option>
+            <option value="beer" data-price="2500">d) One bucket beer — ₹2,500</option>
+            <option value="fire" data-price="2000">e) Fire gun shot — ₹2,000</option>
+            <option value="escort" data-price="5000">f) Bouncer / escort — ₹5,000</option>
+            <option value="pack" data-price="25000">g) All services pack — ₹25,000</option>
           </select>
         </div>
-        <div><label>Music genre</label>
-          <select id="fGenre">
-            <option value="all">All genres</option>
-            <option>EDM</option><option>Bollywood</option><option>Hip-Hop</option>
-            <option>Techno</option><option>House</option><option>Live Music</option>
-          </select>
-        </div>
-        <div><label>Search</label><input id="fQ" placeholder="Club, DJ, area..."></div>
-        <div><label>Availability</label>
-          <select id="fOpen"><option value="0">Any time</option><option value="1">Open now</option></select>
-        </div>
-        <div><label>Safety</label>
-          <select id="fSafe"><option value="0">Any venue</option><option value="verified">Verified only</option><option value="female">Female staff on floor</option></select>
-        </div>
+        <div><label>Search</label><input id="fQ" placeholder="Club, DJ..."></div>
       </div>
+      <p class="meta" id="priceLine">₹1,500 × 2 guests = ₹3,000</p>
       <div class="grid grid-3" id="list"></div>
     </div>
   </section>
   <div id="chrome-footer"></div>
-  <script>
-(function(){
-  var gh = location.hostname.indexOf("github.io")!==-1;
-  document.write('<script src="'+(gh?"data.js":"../js/data.js")+'"><\/script>');
-  document.write('<script src="'+(gh?"app.js":"../js/app.js")+'"><\/script>');
-})();
-</script>
-
+  <script src="data.js"></script>
+  <script src="app.js"></script>
   <script>
     document.getElementById("chrome-header").innerHTML = npHeader("clubs");
     document.getElementById("chrome-footer").innerHTML = npFooter();
     bindChrome();
-    const params = new URLSearchParams(location.search);
-    if (params.get("city")) NP.setCity(params.get("city"));
-    const city = params.get("city") || NP.getCity() || "all";
-    const fCity = document.getElementById("fCity");
-    fCity.innerHTML = `<option value="all">All Cities</option><option value="ncr">NCR (Delhi–Gurugram–Noida)</option>` + NP_DATA.cities.map(c => `<option value="${c.id}" ${c.id===city?"selected":""}>${c.name}</option>`).join("");
-    document.getElementById("fQ").value = params.get("q") || "";
-    function areasFor(cid) {
-      const extra = `<option value="ncr">NCR</option>`;
-      const set = [...new Set(npAllClubs().filter(c => cid==="all" || cid==="ncr" || c.city===cid).map(c => c.area))];
-      document.getElementById("fArea").innerHTML = `<option value="all">All areas</option>` + extra + set.map(a => `<option value="${a}">${a}</option>`).join("");
-    }
-    areasFor(city);
+    var city = (NP.qs("city") || NP.getCity() || "all");
+    if (NP.qs("city")) NP.setCity(NP.qs("city"));
+    var fCity = document.getElementById("fCity");
+    fCity.innerHTML = '<option value="all">All Cities</option><option value="ncr">NCR</option>' +
+      NP_DATA.cities.map(function(c){ return '<option value="'+c.id+'"'+(c.id===city?' selected':'')+'>'+c.name+'</option>'; }).join("");
     function priceSync() {
-      const people = Math.max(1, Number(document.getElementById("fPeople").value || 1));
-      const sel = document.getElementById("fService");
-      const extra = Number(sel.options[sel.selectedIndex].dataset.price || 0);
-      const total = sel.value === "pack" ? 25000 : 1500 * people + extra;
+      var people = Math.max(1, Number(document.getElementById("fPeople").value || 1));
+      var sel = document.getElementById("fService");
+      var extra = Number(sel.options[sel.selectedIndex].dataset.price || 0);
+      var total = sel.value === "pack" ? 25000 : 1500 * people + extra;
       document.getElementById("fPriceShow").value = "₹" + total.toLocaleString("en-IN");
+      document.getElementById("priceLine").textContent = sel.value === "pack"
+        ? "All 6 services pack = ₹25,000"
+        : ("₹1,500 × " + people + " + service = ₹" + total.toLocaleString("en-IN"));
     }
     function render() {
       priceSync();
-      const area = document.getElementById("fArea").value;
-      let cityVal = fCity.value;
-      if (area === "ncr") cityVal = "ncr";
-      let list = filterClubs({
-        city: cityVal,
-        q: document.getElementById("fQ").value,
-        genre: document.getElementById("fGenre").value,
-        openNow: document.getElementById("fOpen").value === "1"
-      });
-      if (area !== "all" && area !== "ncr") list = list.filter(c => c.area === area);
-      const km = document.getElementById("fKm").value;
-      if (km !== "all") {
-        list = list.map((c, i) => Object.assign({}, c, { _km: ((i * 7 + 3) % Number(km)) + 1 })).filter(c => c._km <= Number(km));
-      }
-      const safe = document.getElementById("fSafe").value;
-      if (safe === "verified") list = list.filter(c => c.safety && c.safety.verified);
-      if (safe === "female") list = list.filter(c => c.safety && c.safety.femaleStaff);
-      document.getElementById("list").innerHTML = list.map(clubCard).join("") || "<p class='meta'>No clubs match these filters.</p>";
+      var cityVal = fCity.value;
+      if (document.getElementById("fArea").value === "ncr") cityVal = "ncr";
+      var list = filterClubs({ city: cityVal, q: document.getElementById("fQ").value });
+      document.getElementById("list").innerHTML = list.map(clubCard).join("") || "<p class='meta'>No clubs.</p>";
     }
-    fCity.addEventListener("change", () => { NP.setCity(fCity.value); areasFor(fCity.value); render(); });
-    ["fArea","fGenre","fQ","fOpen","fSafe","fKm","fPeople","fService"].forEach(id => {
+    ["fCity","fArea","fKm","fPeople","fService","fQ"].forEach(function(id){
       document.getElementById(id).addEventListener("input", render);
       document.getElementById(id).addEventListener("change", render);
     });
-    if (params.get("focus")) document.getElementById("fQ").focus();
     render();
   </script>
 </body>
