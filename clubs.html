@@ -48,14 +48,21 @@
           <p>e) Fire gun shot</p>
           <p>f) Bouncer / escort service</p>
         </div>
-            <option value="0" data-price="0">None</option>
-            <option value="table" data-price="3000">a) Dedicated Table — ₹3,000</option>
-            <option value="screen" data-price="1500">b) Name on the screen — ₹1,500</option>
-            <option value="dance" data-price="8000">c) 2 female dance partners — ₹8,000</option>
-            <option value="beer" data-price="2500">d) One bucket beer — ₹2,500</option>
-            <option value="fire" data-price="2000">e) Fire gun shot — ₹2,000</option>
-            <option value="escort" data-price="5000">f) Bouncer / escort — ₹5,000</option>
-            <option value="pack" data-price="25000">g) All services pack — ₹25,000</option>
+                   <div><label>Special service</label>
+          <select id="fService">
+            <option value="0" data-price="0">No special service</option>
+            <option value="pack" data-price="25000">Special service pack — ₹25,000</option>
+          </select>
+        </div>
+        <div id="packList" class="card" style="padding:14px;display:none">
+          <p class="kicker">₹25,000 pack includes</p>
+          <p>a) Dedicated Table</p>
+          <p>b) Name on the screen</p>
+          <p>c) 2 female dance partners</p>
+          <p>d) One bucket beer</p>
+          <p>e) Fire gun shot</p>
+          <p>f) Bouncer / escort service</p>
+        </div>
           </select>
         </div>
         <div><label>Search</label><input id="fQ" placeholder="Club, DJ..."></div>
