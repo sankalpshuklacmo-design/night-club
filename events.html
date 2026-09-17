@@ -3,49 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Parties & Events — After Dark Society</title>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/styles.css" />
+  <title>Parties — After Dark Society</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Manrope:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="chrome-header"></div>
   <section>
     <div class="container">
-      <p class="kicker">Tonight and beyond</p>
-      <div class="section-head">
-        <h2>Filter the lineup</h2>
-        <a class="btn btn-primary" href="list-event.html">List your event</a>
-      </div>
-      <div class="filters" id="tags"></div>
-      <div class="grid grid-3" id="list"></div>
+      <p class="kicker">Parties</p>
+      <h2>Events</h2>
+      <p class="meta" style="margin:8px 0 18px">Sirf admin ke add kiye events.</p>
+      <a class="btn btn-ghost" href="list-event.html">List your event</a>
+      <div class="grid grid-3" id="list" style="margin-top:20px"></div>
     </div>
   </section>
   <div id="chrome-footer"></div>
-  <script>
-(function(){
-  var gh = location.hostname.indexOf("github.io")!==-1;
-  document.write('<script src="'+(gh?"data.js":"../js/data.js")+'"><\/script>');
-  document.write('<script src="'+(gh?"app.js":"../js/app.js")+'"><\/script>');
-})();
-</script>
-
+  <script src="data.js"></script>
+  <script src="app.js"></script>
   <script>
     document.getElementById("chrome-header").innerHTML = npHeader("events");
     document.getElementById("chrome-footer").innerHTML = npFooter();
     bindChrome();
-    const tags = ["all","Tonight","Tomorrow","This Weekend","DJ Night","Bollywood","EDM","Hip-Hop","Techno","Live Music","Ladies Night","Couple Entry","Free Entry"];
-    const box = document.getElementById("tags");
-    box.innerHTML = tags.map((t,i)=>`<button class="chip ${i===0?"active":""}" data-tag="${t}">${t==="all"?"All":t}</button>`).join("");
-    function render(tag) {
-      document.getElementById("list").innerHTML = filterEvents({ city: NP.getCity(), tag: tag==="all"?null:tag }).map(eventCard).join("") || "<p class='meta'>No events for this filter.</p>";
-    }
-    render("all");
-    box.addEventListener("click", e => {
-      const b = e.target.closest(".chip"); if (!b) return;
-      box.querySelectorAll(".chip").forEach(x => x.classList.remove("active"));
-      b.classList.add("active");
-      render(b.dataset.tag);
-    });
+    var rows = npAllEvents();
+    document.getElementById("list").innerHTML = rows.length
+      ? rows.map(eventCard).join("")
+      : "<p class='meta'>Koi event nahi. Admin se add karo.</p>";
   </script>
 </body>
 </html>
