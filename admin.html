@@ -117,7 +117,53 @@
             <button class="btn btn-primary" type="button" id="saveOffBtn">Save offer</button>
           </div>
           <div id="offerAdminList" style="margin-top:16px"></div>
+        </div>        <div id="p-nights" class="card" style="padding:18px;display:none">
+          <h3>Marked nights</h3>
+          <p class="meta">Date add / edit / remove — home calendar yahi se chalegi.</p>
+          <input type="hidden" id="editMarkOld">
+          <div class="form-row"><label>Date</label><input id="markDate" type="date"></div>
+          <div class="form-row"><label>Note (optional)</label><input id="markNote" placeholder="Ladies night"></div>
+          <button class="btn btn-primary" type="button" id="addMarkBtn">Save marked night</button>
+          <div id="markList" style="margin-top:16px"></div>
         </div>
+        <script>
+          (function(){
+            function load(){ try { return JSON.parse(localStorage.getItem("np_marked_nights")||"[]"); } catch(e){ return []; } }
+            function save(list){ localStorage.setItem("np_marked_nights", JSON.stringify(list)); localStorage.setItem("np_marked_dates", JSON.stringify(list.map(function(x){ return x.date; }))); }
+            function paint(){
+              var list = load();
+              document.getElementById("markList").innerHTML = list.length ? list.map(function(x){
+                return "<p class='meta'>"+x.date+" — "+(x.note||"")+" <button type='button' data-ed='"+x.date+"'>Edit</button> <button type='button' data-del='"+x.date+"'>Remove</button></p>";
+              }).join("") : "<p class='meta'>Koi date nahi.</p>";
+            }
+            document.getElementById("addMarkBtn").onclick = function(){
+              var d = document.getElementById("markDate").value;
+              if (!d) return alert("Date choose karo");
+              var note = document.getElementById("markNote").value;
+              var old = document.getElementById("editMarkOld").value;
+              var list = load().filter(function(x){ return x.date !== d && x.date !== old; });
+              list.push({ date:d, note:note });
+              list.sort(function(a,b){ return a.date.localeCompare(b.date); });
+              save(list);
+              document.getElementById("editMarkOld").value = "";
+              document.getElementById("markNote").value = "";
+              paint();
+            };
+            document.getElementById("markList").onclick = function(e){
+              var del = e.target.getAttribute("data-del");
+              var ed = e.target.getAttribute("data-ed");
+              if (del) { save(load().filter(function(x){ return x.date !== del; })); paint(); }
+              if (ed) {
+                var row = load().find(function(x){ return x.date === ed; });
+                if (!row) return;
+                document.getElementById("markDate").value = row.date;
+                document.getElementById("markNote").value = row.note || "";
+                document.getElementById("editMarkOld").value = row.date;
+              }
+            };
+            paint();
+          })();
+        </script>
         <p style="margin-top:16px" class="card-actions">
           <button class="btn btn-ghost" type="button" id="logout">Log out</button>
           <button class="btn btn-ghost" type="button" id="resetPin2">Reset admin PIN</button>
