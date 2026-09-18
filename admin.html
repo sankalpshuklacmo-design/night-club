@@ -316,7 +316,7 @@
       const b = e.target.closest("[data-t]"); if (!b) return;
       document.querySelectorAll("#tabs .chip").forEach(x => x.classList.remove("active"));
       b.classList.add("active");
-      ["req","pay","book","rzp","clubs","events","offers"].forEach(t => {
+      ["req","pay","book","rzp","clubs","events","offers","nights"].forEach(t => {
         document.getElementById("p-" + t).style.display = b.dataset.t === t ? "block" : "none";
       });
     });
